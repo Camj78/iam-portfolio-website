@@ -1,0 +1,29 @@
+{
+  "name": "cameron-johnson-iam-portfolio",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 4500",
+    "build": "next build",
+    "start": "next start -p 4500",
+    "typecheck": "tsc --noEmit",
+    "assets": "node scripts/prepare-assets.mjs",
+    "shoot": "node scripts/shoot.mjs"
+  },
+  "dependencies": {
+    "motion": "^14.4.0",
+    "next": "^16.4.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "playwright-core": "^1.64.1",
+    "sharp": "^0.35.5",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.3"
+  }
+}

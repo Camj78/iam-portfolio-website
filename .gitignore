@@ -9,3 +9,5 @@ next-env.d.ts
 !.env.example
 scrollcraft/lab/
 lab/
+AGENTS.md
+review/
