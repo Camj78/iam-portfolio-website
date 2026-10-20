@@ -160,11 +160,12 @@ export function LifecycleScene() {
         const li = el.card[who as keyof typeof el.card].querySelector<HTMLElement>(`[data-attr="${attr}"]`)!;
         if (state) li.dataset.check = state; else delete li.dataset.check;
       };
+      // The documented Finance rule: (user.department -eq "Finance") -and
+      // (user.employeeType -eq "Employee"). Company is shown but not evaluated.
       check("jonathan", "dept", p > 0.17 ? "pass" : null);
-      check("jonathan", "company", p > 0.185 ? "pass" : null);
-      check("jonathan", "type", p > 0.2 ? "pass" : null);
+      check("jonathan", "type", p > 0.195 ? "pass" : null);
       check("david", "dept", p > 0.71 ? "pass" : null);
-      check("david", "company", p > 0.72 ? "fail" : null);
+      check("david", "type", p > 0.72 ? "fail" : null);
       el.card.sarah.style.setProperty("--flip", ease(seg(p, 0.4, 0.44)).toFixed(4));
       el.card.david.style.setProperty("--flip", ease(seg(p, 0.75, 0.78)).toFixed(4));
       el.card.david.toggleAttribute("data-disabled", p > 0.765);

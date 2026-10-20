@@ -35,6 +35,10 @@ const SETS = {
     stops: [0, 0.06, 0.12, 0.2, 0.26, 0.32, 0.4, 0.44, 0.5, 0.58, 0.62, 0.7, 0.74, 0.78, 0.82, 0.88, 0.95, 1],
     layers: [".lc__sky", ".lc__skyline", ".lc__world", "[data-person=jonathan]", "[data-person=sarah]", "[data-person=david]", ".lc__group--finance", ".lc__fin--1", ".lc__dust"],
   },
+  validation: {
+    stops: [0, 0.07, 0.14, 0.2, 0.25, 0.3, 0.36, 0.42, 0.48, 0.54, 0.6, 0.66, 0.72, 0.78, 0.84, 0.9, 1],
+    layers: [".ev__world", ".ev__door-half--l", ".ev__corridor", ".ev__group", ".ev__shelf", ".ev__fg--l", ".ev__dust"],
+  },
   privilege: {
     stops: [0, 0.08, 0.16, 0.24, 0.32, 0.42, 0.5, 0.6, 0.68, 0.78, 0.86, 0.94, 1],
     layers: [".pv__room", ".pv__world", ".pv__floor", ".pv__au", ".pv__beam", ".pv__card--workforce", ".pv__stack", ".pv__vault", ".pv__fg-orb--1"],

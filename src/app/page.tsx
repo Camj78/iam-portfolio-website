@@ -2,9 +2,9 @@ import { CinematicHero } from "@/components/CinematicHero";
 import { IdentityContinuation } from "@/components/IdentityContinuation";
 import { PrivilegeScene } from "@/components/PrivilegeScene";
 import { LifecycleScene } from "@/components/LifecycleScene";
+import { VaultScene } from "@/components/VaultScene";
 import { AccessPathRail } from "@/components/AccessPathRail";
 import { SiteHeader } from "@/components/SiteHeader";
-import { SkillsLedger } from "@/components/SkillsLedger";
 import { RequestRecord } from "@/components/RequestRecord";
 import { ScrollCraftMount } from "@/components/ScrollCraftMount";
 import { profile } from "@/content/profile";
@@ -41,36 +41,10 @@ export default function Home() {
         {/* LIFECYCLE · CFG Phase 2 (redesign). The full case file lives at /cfg/phase-2. */}
         <LifecycleScene />
 
+        {/* VALIDATION · the evidence vault (redesign) */}
+        <VaultScene />
+
         {/* ---- Below this line: Milestone 1 sections, unchanged pending approval ---- */}
-
-        {/* VALIDATION */}
-        <section id="validation" className="chapter chapter--dark" data-ground="dark" aria-labelledby="validation-title">
-          <div className="wrap">
-            <div className="intertitle">
-              <h2 id="validation-title" className="display">Validation.</h2>
-              <p>What I have proven, what I am learning, and what comes next.</p>
-            </div>
-            <SkillsLedger />
-
-            <div className="cert" data-sc-in>
-              <div>
-                <h3 className="display" style={{ fontSize: "var(--sc-t-2xl)" }}>Certifications and learning</h3>
-                <p style={{ color: "var(--sc-ink-soft)", marginTop: "var(--sc-4)", maxWidth: "44ch" }}>
-                  No certification is shown here as earned until it is. SC-300 is the current focus, and the
-                  case files above are where I practice its domains.
-                </p>
-              </div>
-              <div className="cert__card">
-                <span className="cert__badge mono">In progress · expected 2026</span>
-                <h3>Microsoft SC-300: Identity and Access Administrator</h3>
-                <p>Microsoft certification exam. Study areas:</p>
-                <ul className="domains" style={{ marginTop: "var(--sc-4)" }}>
-                  {SC300_DOMAINS.map((d) => <li key={d}><span>{d}</span><span className="mono" style={{ color: "var(--sc-ink-soft)" }}>Studying</span></li>)}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* ABOUT (approved order: after Validation) */}
         <section id="about" className="chapter chapter--paper" data-ground="paper" aria-labelledby="about-title">
@@ -121,6 +95,29 @@ export default function Home() {
                     <div className="org">{profile.education.school}</div>
                   </li>
                 </ol>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CERTIFICATIONS (approved order: after About). Milestone 1 content, pending its stage. */}
+        <section id="certifications" className="chapter chapter--dark" data-ground="dark" aria-labelledby="certifications-title">
+          <div className="wrap">
+            <div className="cert" data-sc-in>
+              <div>
+                <h2 id="certifications-title" className="display" style={{ fontSize: "var(--sc-t-2xl)" }}>Certifications and learning</h2>
+                <p style={{ color: "var(--sc-ink-soft)", marginTop: "var(--sc-4)", maxWidth: "44ch" }}>
+                  No certification is shown here as earned until it is. SC-300 is the current focus, and the
+                  case files above are where I practice its domains.
+                </p>
+              </div>
+              <div className="cert__card">
+                <span className="cert__badge mono">In progress · expected 2026</span>
+                <h3>Microsoft SC-300: Identity and Access Administrator</h3>
+                <p>Microsoft certification exam. Study areas:</p>
+                <ul className="domains" style={{ marginTop: "var(--sc-4)" }}>
+                  {SC300_DOMAINS.map((d) => <li key={d}><span>{d}</span><span className="mono" style={{ color: "var(--sc-ink-soft)" }}>Studying</span></li>)}
+                </ul>
               </div>
             </div>
           </div>
