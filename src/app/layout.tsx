@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Archivo, Geist, Geist_Mono } from "next/font/google";
 import "@/vendor/scrollcraft/scrollcraft.css";
 import "./globals.css";
+import "./cinematic.css";
 
 const display = Archivo({
   subsets: ["latin"],
@@ -13,7 +14,7 @@ const text = Geist({ subsets: ["latin"], variable: "--font-text", display: "swap
 const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
 const description =
-  "Cameron Johnson, Identity & Access Management. Evidence-based Microsoft Entra ID case studies in privileged access, joiner-mover-leaver lifecycle, RBAC and access certification.";
+  "Cameron Johnson, Identity & Access Management. Evidence-based Microsoft Entra ID case studies in privileged access, scoped administration and joiner-mover-leaver lifecycle, from the Cashville Financial Group IAM lab.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://iam-portfolio-website.vercel.app"),
@@ -40,7 +41,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${text.variable} ${mono.variable}`}>
+    <html lang="en" className={`${display.variable} ${text.variable} ${mono.variable}`} suppressHydrationWarning>
+      <head>
+        {/* Lets the hero lay out its pinned form before hydration, so there is no jump. */}
+        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+      </head>
       <body>{children}</body>
     </html>
   );

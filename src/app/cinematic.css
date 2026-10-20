@@ -1,0 +1,455 @@
+/* =========================================================================
+   CINEMATIC HERO — the studio, and the push into the identity system
+   Default (no JS, reduced motion): two static frames, studio then Identity.
+   Live (JS + motion allowed): one pinned 5-viewport Scroll Craft act whose
+   planes the choreographer in CinematicHero.tsx drives from --sc-p.
+   ========================================================================= */
+
+.cine {
+  --fh: max(100svh, 34rem);         /* one frame */
+  --f2: var(--fh);                  /* static: the Identity frame sits below the studio */
+  --front: clamp(4.5rem, 11svh, 7.5rem);
+  --tabletop: clamp(2rem, 5svh, 3.5rem);
+  --door: 76%;
+  --vp-y: 44%;
+  position: relative;
+  background: var(--sc-canvas);
+  color: var(--sc-ink);
+}
+.cine__anchor { position: absolute; left: 0; top: var(--f2); width: 1px; height: 1px; scroll-margin-top: 0; pointer-events: none; }
+
+.cine__stage {
+  position: relative;
+  height: calc(var(--fh) * 2);
+  overflow: clip;
+  isolation: isolate;
+  background: #0a110e;
+}
+
+/* Planes: frame-1 planes cover the studio, frame-2 planes the Identity scene. */
+.cine__wall, .cine__spill, .cine__set, .cine__fg, .cine__key, .cine__vignette, .cine__dust {
+  position: absolute; left: 0; right: 0; top: 0; height: var(--fh);
+}
+.cine__rear, .cine__graph, .cine__identity-plane {
+  position: absolute; left: 0; right: 0; top: var(--f2); height: var(--fh);
+}
+
+/* ---------------------------------------------------------------- L0 rear */
+.cine__rear {
+  z-index: 0;
+  background:
+    radial-gradient(34% 44% at 64% 52%, rgb(102 199 147 / 0.2), transparent 70%),
+    radial-gradient(26% 40% at 76% 42%, rgb(244 236 220 / 0.12), transparent 72%),
+    radial-gradient(80% 70% at 70% 46%, rgb(40 78 58 / 0.55), transparent 80%),
+    linear-gradient(180deg, #08100c 0%, #0c1913 55%, #0a110e 100%);
+  will-change: transform;
+}
+.cine__rings {
+  position: absolute; inset: -20%;
+  background:
+    repeating-radial-gradient(ellipse 50% 34% at 61% 57%,
+      transparent 0 calc(7vmin - 1px), rgb(236 231 220 / 0.07) calc(7vmin - 1px) 7vmin);
+  mask-image: radial-gradient(48% 48% at 61% 57%, #000 30%, transparent 78%);
+  -webkit-mask-image: radial-gradient(48% 48% at 61% 57%, #000 30%, transparent 78%);
+}
+.cine__far {
+  position: absolute; left: var(--x); top: var(--y); translate: -50% -50%;
+  display: grid; gap: 0.1rem; padding: 0.45rem 0.75rem;
+  border: 1px solid rgb(236 231 220 / 0.12); border-radius: 10px;
+  background: rgb(16 26 21 / 0.6);
+  font-size: 0.78rem; white-space: nowrap; color: var(--sc-ink-soft);
+  filter: blur(1.2px); opacity: 0.5;
+}
+.cine__far strong { font-weight: 600; color: color-mix(in oklab, var(--sc-ink) 80%, transparent); }
+.cine__far span { font-family: var(--sc-font-mono); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; }
+
+/* ---------------------------------------------------------------- L1 wall */
+.cine__wall { z-index: 1; will-change: transform; }
+.cine__panel {
+  position: absolute; top: -8%; bottom: -8%;
+  background:
+    radial-gradient(48% 60% at 60% 30%, rgb(214 160 104 / 0.16), transparent 72%),
+    repeating-linear-gradient(90deg,
+      rgb(255 255 255 / 0.02) 0 2px, transparent 2px 44px,
+      rgb(0 0 0 / 0.26) 44px 46px, transparent 46px 90px),
+    linear-gradient(180deg, #121c17 0%, #0d1511 62%, #0a100d 100%);
+  will-change: transform;
+}
+/* The open door's edges catch the light from beyond. */
+.cine__panel::after {
+  content: ""; position: absolute; top: 0; bottom: 0; width: 3px;
+  background: linear-gradient(180deg, transparent 8%, rgb(244 236 220 / 0.55) 40%, rgb(244 236 220 / 0.35) 75%, transparent 95%);
+  opacity: calc(var(--cine-open, 0) * 1.6);
+}
+.cine__panel--l::after { right: 0; }
+.cine__panel--r::after { left: 0; }
+.cine__panel--l { left: -14%; right: calc(100% - var(--door)); box-shadow: inset -1px 0 0 rgb(236 231 220 / 0.07), 18px 0 40px -10px rgb(0 0 0 / 0.6); }
+.cine__panel--r {
+  left: var(--door); right: -16%;
+  background-position: -23px 0;
+  box-shadow: inset 1px 0 0 rgb(236 231 220 / 0.05), -18px 0 40px -10px rgb(0 0 0 / 0.6);
+}
+/* Light leaking through the door seam before it opens: soft, not a UI rule. */
+.cine__slit {
+  position: absolute; top: 0; bottom: 0; left: var(--door); width: 18vw; translate: -50% 0;
+  background:
+    linear-gradient(90deg, transparent 47%, rgb(244 236 220 / 0.5) 49.6%, rgb(250 244 232 / 0.85) 50%, rgb(244 236 220 / 0.5) 50.4%, transparent 53%),
+    radial-gradient(50% 46% at 50% 44%, rgb(236 231 220 / 0.16), transparent 72%);
+  mask-image: linear-gradient(180deg, transparent 4%, #000 26%, #000 70%, transparent 96%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 4%, #000 26%, #000 70%, transparent 96%);
+  filter: blur(0.6px);
+  opacity: 0;
+}
+.cine__spill {
+  z-index: 1;
+  background:
+    radial-gradient(30% 52% at var(--door) var(--vp-y), rgb(236 231 220 / 0.16), transparent 70%),
+    radial-gradient(46% 26% at var(--door) 92%, rgb(102 199 147 / 0.10), transparent 70%);
+  mix-blend-mode: screen; opacity: 0; pointer-events: none;
+}
+
+/* ----------------------------------------------------- L2 identity objects */
+.cine__graph { z-index: 2; }
+.cine__links { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.cine__links--m { display: none; }
+.cine__link { stroke: rgb(236 231 220 / 0.38); stroke-width: 1.25; fill: none; }
+.cine__link--dashed { stroke: rgb(236 231 220 / 0.3); stroke-dasharray: 5 6; }
+.cine__nodes { list-style: none; margin: 0; padding: 0; position: absolute; inset: 0; }
+.cine__node {
+  position: absolute; left: var(--x); top: var(--y); translate: -50% -50%;
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.55rem 1.1rem 0.55rem 0.55rem;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgb(28 41 34 / 0.94), rgb(17 27 22 / 0.94));
+  border: 1px solid rgb(236 231 220 / 0.12);
+  box-shadow: inset 0 1px 0 rgb(236 231 220 / 0.09), 0 18px 40px -18px rgb(0 0 0 / 0.8), 0 2px 6px rgb(0 0 0 / 0.3);
+  white-space: nowrap;
+  opacity: var(--rest);
+  transform-origin: 50% 50%;
+  will-change: transform, opacity, filter;
+}
+.cine__node-mark {
+  width: 2.4rem; height: 2.4rem; border-radius: 50%; flex: none;
+  display: grid; place-items: center;
+  font-family: var(--sc-font-display); font-weight: 700; font-size: 0.82rem; letter-spacing: 0.02em;
+}
+.cine__node-text { display: grid; gap: 0.15rem; }
+.cine__node-text strong { font-size: 0.98rem; font-weight: 600; letter-spacing: -0.01em; }
+.cine__node-text span { font-family: var(--sc-font-mono); font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sc-ink-soft); }
+.cine__node[data-kind="person"] { padding-right: 1.4rem; }
+.cine__node[data-kind="person"] .cine__node-mark { background: var(--felt); color: #2a1d10; width: 3rem; height: 3rem; font-size: 1rem; }
+.cine__node[data-kind="person"] strong { font-size: 1.15rem; }
+.cine__node[data-kind="workforce"] .cine__node-mark { border: 1.5px solid rgb(236 231 220 / 0.7); }
+.cine__node[data-kind="workforce"] .cine__node-mark::before { content: ""; width: 0.7rem; height: 0.7rem; border-radius: 50%; background: rgb(236 231 220 / 0.85); }
+.cine__node[data-kind="privileged"] { border-color: rgb(102 199 147 / 0.45); }
+.cine__node[data-kind="privileged"] .cine__node-mark { background: var(--sc-accent); }
+.cine__node[data-kind="privileged"] .cine__node-mark::before {
+  content: ""; width: 0.8rem; height: 0.95rem; border-radius: 3px 3px 2px 2px;
+  background: #0c1310; clip-path: polygon(0 40%, 100% 40%, 100% 100%, 0 100%, 0 40%, 20% 40%, 20% 18%, 50% 0, 80% 18%, 80% 40%, 66% 40%, 66% 24%, 50% 14%, 34% 24%, 34% 40%);
+}
+.cine__node[data-kind="role"] .cine__node-mark { border: 1.5px dashed rgb(236 231 220 / 0.55); }
+.cine__node[data-kind="breakglass"] .cine__node-mark {
+  border: 1.5px solid var(--felt);
+  background: repeating-linear-gradient(135deg, rgb(200 162 124 / 0.55) 0 3px, transparent 3px 7px);
+}
+
+/* ------------------------------------------------------------ L3 the name */
+.cine__name {
+  position: absolute; z-index: 3;
+  left: var(--sc-gutter); top: clamp(5.5rem, 13svh, 8.5rem);
+  margin: 0;
+  font-family: var(--sc-font-display);
+  font-weight: 800; font-stretch: 112%;
+  font-size: clamp(4rem, 10vw, 11.5rem);
+  line-height: 0.86; letter-spacing: -0.045em;
+  text-transform: uppercase;
+  will-change: opacity;
+}
+.cine__name-row { display: block; transform-origin: 0 50%; will-change: transform; }
+.cine__name-row--2 { color: color-mix(in oklab, var(--sc-ink) 72%, var(--felt)); }
+
+.cine__claim {
+  position: absolute; z-index: 3;
+  left: 53%; right: var(--sc-gutter); top: 27svh;
+  display: none;
+}
+.cine__claim-line {
+  margin: 0;
+  font-family: var(--sc-font-display); font-weight: 800; font-stretch: 108%;
+  font-size: clamp(2.6rem, 4.9vw, 6rem); line-height: 0.95; letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+.cine__claim-sub { margin: var(--sc-5) 0 0; color: var(--sc-ink-soft); max-width: 46ch; line-height: 1.8; }
+.cine__sign {
+  position: absolute; z-index: 3;
+  left: calc(var(--door) - 5.5%); top: 15svh;
+  margin: 0; display: none;
+  color: var(--sc-ink); letter-spacing: 0.14em;
+}
+.cine__sign span { display: block; margin-top: 0.4rem; color: var(--sc-ink-soft); letter-spacing: 0.08em; font-size: 0.68rem; }
+
+/* ----------------------------------------------------------- L4 the set */
+.cine__set { z-index: 4; will-change: transform, opacity; pointer-events: none; }
+.cine__tabletop {
+  position: absolute; left: -45%; right: -45%;
+  bottom: var(--front); height: var(--tabletop);
+  background:
+    radial-gradient(30% 140% at 62% 100%, rgb(214 170 120 / 0.16), transparent 70%),
+    linear-gradient(180deg, #131d18 0%, #1e2d25 100%);
+}
+.cine__aria {
+  position: absolute; left: 71%; translate: -50% 0;
+  bottom: calc(var(--front) - 1.2svh);
+  height: min(78svh, 50rem); aspect-ratio: 760 / 941;
+  will-change: transform;
+}
+.cine__aria img, .cine__aria canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.cine__aria canvas { display: none; }
+.cine__shadow {
+  position: absolute; left: 4%; right: 4%; bottom: -0.6svh; height: 5svh; z-index: -1;
+  background: radial-gradient(50% 50% at 50% 50%, rgb(0 0 0 / 0.6), transparent 70%);
+  filter: blur(6px);
+}
+.cine__desk {
+  position: absolute; left: -45%; right: -45%; bottom: 0; height: var(--front);
+  background:
+    linear-gradient(180deg, rgb(236 231 220 / 0.18) 0, rgb(236 231 220 / 0.18) 1px, rgb(0 0 0 / 0.4) 1px, transparent 7px),
+    repeating-linear-gradient(90deg, transparent 0 18vw, rgb(255 255 255 / 0.035) 18vw calc(18vw + 1px)),
+    linear-gradient(180deg, #1b2921 0%, #111b16 34%, #0a110d 100%);
+  box-shadow: 0 -12px 26px -14px rgb(0 0 0 / 0.75);
+}
+.cine__desk-light {
+  position: absolute; left: 0; right: 0; top: 7px; height: 2px;
+  background: linear-gradient(90deg, transparent, rgb(102 199 147 / 0.55) 30%, rgb(102 199 147 / 0.55) 70%, transparent);
+  opacity: 0.7;
+}
+
+/* ------------------------------------------------------- L5 foreground */
+.cine__fg { z-index: 5; display: none; pointer-events: none; will-change: transform; }
+.cine__fg-chip {
+  position: absolute;
+  display: grid; place-items: center;
+  border-radius: 22px;
+  border: 1px solid rgb(236 231 220 / 0.16);
+  background: linear-gradient(180deg, rgb(236 231 220 / 0.1), rgb(236 231 220 / 0.03));
+  font-family: var(--sc-font-display); font-weight: 800; color: rgb(236 231 220 / 0.42);
+  filter: blur(10px); opacity: 0.8;
+  will-change: transform;
+}
+.cine__fg-chip--1 { left: -4vw; top: 30%; width: 15vw; height: 9vw; font-size: 4vw; }
+.cine__fg-chip--2 { right: -3vw; top: 74%; width: 17vw; height: 10vw; font-size: 4.4vw; }
+.cine__fg-chip--3 { left: 40%; top: 104%; width: 13vw; height: 8vw; font-size: 3.4vw; filter: blur(12px); }
+
+/* ------------------------------------------------------ L6 atmosphere */
+.cine__key {
+  z-index: 6; pointer-events: none;
+  background:
+    conic-gradient(from 200deg at 82% -6%, transparent 0deg, rgb(240 210 165 / 0.07) 14deg, transparent 34deg),
+    radial-gradient(34% 46% at 74% 8%, rgb(240 200 150 / 0.09), transparent 70%);
+  mix-blend-mode: screen;
+}
+.cine__vignette {
+  z-index: 7; pointer-events: none;
+  background: radial-gradient(120% 90% at 50% 45%, transparent 55%, rgb(4 8 6 / 0.55) 100%);
+}
+.cine__dust {
+  top: -15%; height: calc(var(--fh) * 1.3);
+  pointer-events: none; background-repeat: repeat;
+}
+.cine__dust--far {
+  z-index: 1;
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, rgb(236 231 220 / 0.35), transparent),
+    radial-gradient(1px 1px at 64% 42%, rgb(236 231 220 / 0.3), transparent),
+    radial-gradient(1px 1px at 38% 76%, rgb(236 231 220 / 0.3), transparent),
+    radial-gradient(1px 1px at 86% 88%, rgb(236 231 220 / 0.25), transparent);
+  background-size: 260px 240px;
+}
+.cine__dust--mid {
+  z-index: 4;
+  background-image:
+    radial-gradient(1.5px 1.5px at 22% 30%, rgb(240 214 176 / 0.45), transparent),
+    radial-gradient(1.5px 1.5px at 74% 64%, rgb(240 214 176 / 0.35), transparent);
+  background-size: 420px 380px;
+}
+.cine__dust--near {
+  z-index: 6;
+  background-image:
+    radial-gradient(3px 3px at 30% 40%, rgb(240 214 176 / 0.28), transparent),
+    radial-gradient(2.5px 2.5px at 80% 12%, rgb(240 214 176 / 0.22), transparent);
+  background-size: 720px 640px;
+  filter: blur(1px);
+}
+
+/* ------------------------------------------------------------------ copy */
+.cine__open {
+  position: absolute; z-index: 8;
+  left: var(--sc-gutter); top: 59svh;
+  width: min(31rem, 40vw);
+}
+.cine__eyebrow { margin: 0; color: var(--sc-accent); letter-spacing: 0.14em; }
+.cine__lede {
+  margin: var(--sc-3) 0 0;
+  font-size: clamp(1.25rem, 0.9rem + 0.8vw, 1.75rem); line-height: 1.3; letter-spacing: -0.015em;
+  text-wrap: balance; max-width: 24ch;
+}
+.cine__cta {
+  position: absolute; z-index: 8;
+  left: var(--sc-gutter); top: calc(59svh + clamp(7.5rem, 15svh, 9.5rem));
+  display: flex; flex-wrap: wrap; gap: var(--sc-3);
+}
+
+.cine__identity-plane { z-index: 8; pointer-events: none; }
+.cine__identity {
+  position: absolute; left: var(--sc-gutter); top: 13%;
+  width: min(30rem, 36vw);
+  pointer-events: auto;
+}
+.cine__id-title {
+  margin: 0;
+  font-family: var(--sc-font-display); font-weight: 800; font-stretch: 108%;
+  font-size: clamp(4rem, 10.5vw, 12rem); line-height: 0.88; letter-spacing: -0.05em;
+  white-space: nowrap;
+  transform-origin: 0 60%;
+  will-change: transform, opacity, filter;
+}
+.cine__id-copy { margin-top: clamp(1.5rem, 4svh, 2.75rem); }
+.cine__id-lede { margin: 0; font-size: clamp(1.15rem, 0.9rem + 0.6vw, 1.5rem); line-height: 1.35; letter-spacing: -0.012em; text-wrap: balance; max-width: 24ch; }
+.cine__id-meta { margin: var(--sc-4) 0 0; color: var(--sc-ink-soft); }
+.cine__id-link {
+  display: inline-flex; align-items: center; gap: 0.4em; min-height: 2.75rem; margin-top: var(--sc-3);
+  color: var(--sc-accent); font-weight: 600; text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklab, var(--sc-accent) 40%, transparent);
+}
+.cine__id-link:hover { border-bottom-color: var(--sc-accent); }
+
+/* Static frames: the studio faces the visitor; the wall stays closed. */
+.cine__fg, .cine__claim, .cine__sign { display: none; }
+
+/* =========================================================================
+   LIVE: JS present and motion allowed. One pinned frame; JS owns transforms.
+   ========================================================================= */
+@media (prefers-reduced-motion: no-preference) {
+  :root.js .cine { --f2: 0px; height: 500vh; }
+  :root.js .cine__anchor { top: calc(400vh * 0.84); }
+  :root.js .cine__stage { position: sticky; top: 0; height: var(--fh); }
+  :root.js .cine__aria { left: 0; translate: none; }
+  :root.js .cine__aria canvas { display: block; opacity: 0; transition: opacity 260ms var(--sc-ease-out); }
+  :root.js .cine__aria[data-ready] canvas { opacity: 1; }
+  :root.js .cine__aria[data-ready] img { opacity: 0; }
+  :root.js .cine__fg { display: block; }
+  :root.js .cine__claim, :root.js .cine__sign { display: block; }
+  :root.js .cine__link:not(.cine__link--dashed) { opacity: 0; }
+  :root.js .cine[data-live] .cine__link:not(.cine__link--dashed) { opacity: 1; }
+  :root.js .cine__link--dashed { opacity: 0; }
+  :root.js .cine__id-copy { opacity: 0; }
+  :root.js .cine__id-title { opacity: 0; }
+  :root.js .cine__node { opacity: 0; }
+}
+
+/* =========================================================================
+   PHONE: its own composition, not a shrunk desktop.
+   Name over the subject's head, CTAs on the desk front, a vertical graph.
+   ========================================================================= */
+@media (max-width: 860px) {
+  .cine {
+    --front: clamp(6rem, 15svh, 8rem);
+    --tabletop: clamp(1.5rem, 3.5svh, 2.25rem);
+    --door: 78%;
+    --vp-y: 40%;
+  }
+  .cine__name { top: 19svh; font-size: clamp(2.4rem, 15vw, 6rem); }
+  .cine__aria { left: 55%; height: min(54svh, 32rem); }
+  .cine__open { top: calc(var(--header-h) + 1.25svh); right: var(--sc-gutter); width: auto; }
+  .cine__lede { font-size: 1.08rem; max-width: 30ch; margin-top: var(--sc-2); }
+  .cine__cta {
+    /* Centred on the desk front, measured from the top so the static
+       two-frame stage keeps it in the studio frame. */
+    top: calc(var(--fh) - (var(--front) + 2.9rem) / 2 + 0.2rem);
+    left: var(--sc-gutter); right: var(--sc-gutter);
+    justify-content: center; flex-wrap: nowrap;
+  }
+  .cine__cta .btn { padding-inline: 1rem; }
+  .cine__desk-light { top: 6px; }
+  .cine__claim { left: var(--sc-gutter); right: var(--sc-gutter); top: calc(var(--header-h) + 3svh); }
+  .cine__claim-line { font-size: clamp(2rem, 10vw, 3.4rem); }
+  .cine__claim-sub { margin-top: var(--sc-3); font-size: 0.66rem; }
+  .cine__sign { left: var(--sc-gutter); top: calc(var(--header-h) + 3svh); }
+
+  .cine__identity { top: 11%; right: var(--sc-gutter); width: auto; }
+  .cine__id-title { font-size: clamp(3rem, 17vw, 6rem); }
+  .cine__id-copy { margin-top: var(--sc-4); }
+  .cine__id-lede { font-size: 1.05rem; max-width: 30ch; }
+  .cine__id-meta { margin-top: var(--sc-2); }
+  .cine__id-link { margin-top: 0; }
+
+  .cine__links--d { display: none; }
+  .cine__links--m { display: block; }
+  .cine__node { left: var(--mx); top: var(--my); gap: 0.55rem; padding: 0.4rem 0.75rem 0.4rem 0.4rem; border-radius: 13px; }
+  .cine__node-mark { width: 1.9rem; height: 1.9rem; font-size: 0.7rem; }
+  .cine__node[data-kind="person"] .cine__node-mark { width: 2.3rem; height: 2.3rem; font-size: 0.8rem; }
+  .cine__node-text strong { font-size: 0.82rem; }
+  .cine__node[data-kind="person"] strong { font-size: 0.92rem; }
+  .cine__node-text span { font-size: 0.58rem; }
+  .cine__far { left: var(--mx); top: var(--my); font-size: 0.68rem; }
+  .cine__far--wide { display: none; }
+
+  .cine__fg-chip--1 { width: 30vw; height: 18vw; font-size: 8vw; top: 44%; left: -16vw; }
+  .cine__fg-chip--2 { width: 32vw; height: 19vw; font-size: 8vw; top: 66%; right: -18vw; }
+  .cine__fg-chip--3 { width: 26vw; height: 16vw; font-size: 7vw; }
+}
+
+/* Short phones: keep the name clear of the subject. */
+@media (max-width: 860px) and (max-height: 700px) {
+  .cine__aria { height: min(44svh, 26rem); }
+  .cine__name { top: calc(var(--header-h) + 5.5rem); font-size: clamp(2.2rem, 13.5vw, 4rem); }
+  .cine__open { top: calc(var(--header-h) + 0.25rem); }
+  .cine__lede { font-size: 0.95rem; line-height: 1.25; }
+  .cine__claim-sub { display: none; }
+}
+
+/* =========================================================================
+   IDENTITY · continuation after the pin releases
+   ========================================================================= */
+.idx {
+  position: relative; background: #0a110e; color: var(--sc-ink);
+  padding: clamp(3rem, 8vw, 7rem) 0 var(--sc-section);
+  overflow: clip;
+}
+.idx::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 30%;
+  background: linear-gradient(180deg, #0a110e, transparent);
+  pointer-events: none;
+}
+.idx__grid {
+  display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(2rem, 5vw, 5rem); align-items: center;
+}
+.idx__types { list-style: none; margin: 0; padding: 0; }
+.idx__types li {
+  display: grid; grid-template-columns: 2.6rem 1fr; gap: 0 var(--sc-4); align-items: baseline;
+  padding: var(--sc-5) 0; border-top: 1px solid var(--sc-hairline);
+}
+.idx__types li:last-child { border-bottom: 1px solid var(--sc-hairline); }
+.idx__types .mono { color: var(--sc-ink-soft); }
+.idx__types h3 { margin: 0; font-family: var(--sc-font-display); font-weight: 700; font-stretch: 108%; font-size: var(--sc-t-xl); letter-spacing: -0.03em; }
+.idx__types p { grid-column: 2; margin: var(--sc-2) 0 0; color: var(--sc-ink-soft); max-width: 40ch; }
+.idx__frame { position: relative; padding: 4% 0 6% 6%; }
+.idx__plate {
+  position: absolute; inset: 0 10% 0 0; border-radius: 22px;
+  background: radial-gradient(70% 80% at 30% 30%, rgb(102 199 147 / 0.12), transparent 70%), #111b16;
+  border: 1px solid var(--sc-hairline);
+}
+.idx__shot {
+  position: relative; display: block; border-radius: 14px; overflow: hidden;
+  box-shadow: 0 30px 60px -24px rgb(0 0 0 / 0.85), 0 0 0 1px rgb(236 231 220 / 0.1);
+  transform: rotate(-1.2deg);
+}
+.idx__shot img { display: block; width: 100%; height: auto; }
+.idx__caption { position: relative; display: flex; justify-content: space-between; gap: var(--sc-4); margin-top: var(--sc-4); color: var(--sc-ink-soft); }
+.idx__caption a { color: var(--sc-accent); text-decoration: none; font-weight: 600; white-space: nowrap; }
+@media (max-width: 860px) {
+  .idx__grid { grid-template-columns: 1fr; }
+  .idx__frame { padding: 5% 0 7% 5%; }
+  .idx__caption { flex-direction: column; }
+}

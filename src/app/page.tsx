@@ -1,15 +1,17 @@
-import { AriaHero } from "@/components/AriaHero";
+import { CinematicHero } from "@/components/CinematicHero";
+import { IdentityContinuation } from "@/components/IdentityContinuation";
 import { AccessPathRail } from "@/components/AccessPathRail";
 import { SiteHeader } from "@/components/SiteHeader";
 import { CaseFile } from "@/components/CaseFile";
 import { SkillsLedger } from "@/components/SkillsLedger";
 import { RequestRecord } from "@/components/RequestRecord";
 import { ScrollCraftMount } from "@/components/ScrollCraftMount";
-import { cases } from "@/content/cases";
+import { publishedCases } from "@/content/cases";
 import { profile } from "@/content/profile";
 import { lounge, episodes } from "@/content/lounge";
 
-const [case01, case02, case03] = cases;
+// CFG only. GHOSTD stays in content/cases.ts, unrendered, until the redesign is approved.
+const [case01, case02] = publishedCases;
 
 const SC300_DOMAINS = [
   "Implement and manage user identities",
@@ -22,7 +24,7 @@ export default function Home() {
   return (
     <>
       <noscript>
-        <style>{`[data-sc-in],[data-sc-stagger]>*{opacity:1!important;transform:none!important}`}</style>
+        <style>{`[data-sc-in],[data-sc-stagger]>*,[data-sc-cue]{opacity:1!important;transform:none!important}`}</style>
       </noscript>
       <a className="skip" href="#identity">Skip to content</a>
 
@@ -31,13 +33,17 @@ export default function Home() {
       <AccessPathRail />
 
       <main>
-        <AriaHero />
+        {/* REDESIGN · vertical slice: the studio and the push into Identity */}
+        <CinematicHero />
+        <IdentityContinuation />
 
-        {/* IDENTITY */}
-        <section id="identity" className="chapter chapter--paper" data-ground="paper" aria-labelledby="identity-title">
+        {/* ---- Below this line: Milestone 1 sections, unchanged pending approval ---- */}
+
+        {/* ABOUT (was the Identity chapter) */}
+        <section id="about" className="chapter chapter--paper" data-ground="paper" aria-labelledby="about-title">
           <div className="wrap">
             <div className="intertitle">
-              <h2 id="identity-title" className="display">Identity.</h2>
+              <h2 id="about-title" className="display">About.</h2>
               <p>Who I am, and why identity is the work I chose.</p>
             </div>
             <div className="about">
@@ -55,7 +61,7 @@ export default function Home() {
                   </p>
                   <p>
                     In my own Microsoft Entra ID labs I design and test <strong>identity governance</strong>:
-                    joiner-mover-leaver lifecycle, RBAC, access reviews, privileged access and least privilege.
+                    joiner-mover-leaver lifecycle, RBAC, privileged access and least privilege.
                     Each project records what I configured, how I validated it, and what it does not prove.
                     I&apos;m currently preparing for <strong>Microsoft SC-300</strong>.
                   </p>
@@ -118,7 +124,6 @@ export default function Home() {
               <p>Access should arrive, change and leave with the person.</p>
             </div>
             <CaseFile c={case02} />
-            <CaseFile c={case03} />
           </div>
         </section>
 

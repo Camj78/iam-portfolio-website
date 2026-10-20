@@ -16,6 +16,7 @@ export function AccessPathRail() {
     const read = () => {
       raf = 0;
       const vh = innerHeight;
+      // Hidden while the pinned hero owns the screen; it arrives as the pin lets go.
       const hero = document.getElementById("top");
       setVisible(!!hero && hero.getBoundingClientRect().bottom < vh * 0.55);
 
