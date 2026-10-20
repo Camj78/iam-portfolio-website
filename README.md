@@ -22,9 +22,17 @@ npm run build        # static production build
 | `src/components/` | Rail navigation, case files, evidence lightbox, skills ledger, contact record |
 | `assets-src/` | Read-only source copies of the original assets. Never modified. |
 | `scripts/prepare-assets.mjs` | Non-destructive: writes optimized copies to `public/**/optimized/` only |
+| `scripts/redact-evidence.mjs` | Builds public-safe evidence screenshots (admin account, tenant domain and browser bar hidden) |
 | `scripts/shoot.mjs` | Screenshot verification across viewports and reduced motion |
 | `scripts/check-interactions.mjs` | Keyboard, lightbox, filters, links, reverse-scroll checks |
 | `scrollcraft/builds/case-file/BRIEF.md` | Creative brief, grammar, feeling curve |
+
+## Evidence screenshots
+
+The CFG screenshots in `assets-src/evidence/` and `public/evidence/optimized/` are
+**redacted copies**: the signed-in admin account, admin UPN tenant domain and the
+browser toolbar are covered with labelled blocks. Unredacted copies are kept only
+on the author's machine in `assets-src/evidence-original/`, which is git-ignored.
 
 ## A.R.I.A. frames
 

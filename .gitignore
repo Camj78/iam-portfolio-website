@@ -11,3 +11,13 @@ scrollcraft/lab/
 lab/
 AGENTS.md
 review/
+
+# Unredacted evidence screenshots stay local only (see scripts/redact-evidence.mjs)
+assets-src/evidence-original/
+
+# Logs and editor/OS clutter
+*.log
+npm-debug.log*
+.turbo/
+.idea/
+.vscode/
