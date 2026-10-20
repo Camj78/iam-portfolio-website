@@ -303,6 +303,14 @@ body { overflow-x: clip; }
   .hero:not([data-live]) .hero__name { position: relative; top: 0; left: 0; padding-inline: var(--sc-gutter); font-size: clamp(2.8rem, 13vw, 4.6rem); }
 }
 
+/* Short phones: give the copy the top half and A.R.I.A. the bottom. */
+@media (max-width: 860px) and (max-height: 760px) {
+  .hero__aria { height: min(40svh, 22rem); }
+  .hero__intro .display { font-size: clamp(1.9rem, 8.4vw, 2.4rem); }
+  .hero__path a { min-height: 2.75rem; padding: 0.3rem 0; }
+  .hero__path a .display { font-size: clamp(1.3rem, 6vw, 1.6rem); }
+}
+
 /* =========================================================================
    ACCESS PATH RAIL — the page's navigation
    ========================================================================= */
