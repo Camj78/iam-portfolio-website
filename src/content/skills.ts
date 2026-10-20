@@ -12,8 +12,8 @@ export type Skill = {
   evidence?: { label: string; href: string };
 };
 
-const c1 = { label: "Case 01", href: "#case-01" };
-const c2 = { label: "Case 02", href: "#case-02" };
+const c1 = { label: "CFG Phase 1", href: "/cfg/phase-1" };
+const c2 = { label: "CFG Phase 2", href: "/cfg/phase-2" };
 const cv = { label: "Résumé", href: "/resume/Cameron-Johnson-IAM-Resume.pdf" };
 
 export const skills: Skill[] = [

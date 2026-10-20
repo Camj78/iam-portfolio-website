@@ -3,6 +3,8 @@ import { Archivo, Geist, Geist_Mono } from "next/font/google";
 import "@/vendor/scrollcraft/scrollcraft.css";
 import "./globals.css";
 import "./cinematic.css";
+import "./privilege.css";
+import "./lifecycle.css";
 
 const display = Archivo({
   subsets: ["latin"],

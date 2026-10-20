@@ -1,17 +1,15 @@
 import { CinematicHero } from "@/components/CinematicHero";
 import { IdentityContinuation } from "@/components/IdentityContinuation";
+import { PrivilegeScene } from "@/components/PrivilegeScene";
+import { LifecycleScene } from "@/components/LifecycleScene";
 import { AccessPathRail } from "@/components/AccessPathRail";
 import { SiteHeader } from "@/components/SiteHeader";
-import { CaseFile } from "@/components/CaseFile";
 import { SkillsLedger } from "@/components/SkillsLedger";
 import { RequestRecord } from "@/components/RequestRecord";
 import { ScrollCraftMount } from "@/components/ScrollCraftMount";
-import { publishedCases } from "@/content/cases";
 import { profile } from "@/content/profile";
 import { lounge, episodes } from "@/content/lounge";
 
-// CFG only. GHOSTD stays in content/cases.ts, unrendered, until the redesign is approved.
-const [case01, case02] = publishedCases;
 
 const SC300_DOMAINS = [
   "Implement and manage user identities",
@@ -37,9 +35,44 @@ export default function Home() {
         <CinematicHero />
         <IdentityContinuation />
 
+        {/* PRIVILEGE · CFG Phase 1 (redesign). The full case file lives at /cfg/phase-1. */}
+        <PrivilegeScene />
+
+        {/* LIFECYCLE · CFG Phase 2 (redesign). The full case file lives at /cfg/phase-2. */}
+        <LifecycleScene />
+
         {/* ---- Below this line: Milestone 1 sections, unchanged pending approval ---- */}
 
-        {/* ABOUT (was the Identity chapter) */}
+        {/* VALIDATION */}
+        <section id="validation" className="chapter chapter--dark" data-ground="dark" aria-labelledby="validation-title">
+          <div className="wrap">
+            <div className="intertitle">
+              <h2 id="validation-title" className="display">Validation.</h2>
+              <p>What I have proven, what I am learning, and what comes next.</p>
+            </div>
+            <SkillsLedger />
+
+            <div className="cert" data-sc-in>
+              <div>
+                <h3 className="display" style={{ fontSize: "var(--sc-t-2xl)" }}>Certifications and learning</h3>
+                <p style={{ color: "var(--sc-ink-soft)", marginTop: "var(--sc-4)", maxWidth: "44ch" }}>
+                  No certification is shown here as earned until it is. SC-300 is the current focus, and the
+                  case files above are where I practice its domains.
+                </p>
+              </div>
+              <div className="cert__card">
+                <span className="cert__badge mono">In progress · expected 2026</span>
+                <h3>Microsoft SC-300: Identity and Access Administrator</h3>
+                <p>Microsoft certification exam. Study areas:</p>
+                <ul className="domains" style={{ marginTop: "var(--sc-4)" }}>
+                  {SC300_DOMAINS.map((d) => <li key={d}><span>{d}</span><span className="mono" style={{ color: "var(--sc-ink-soft)" }}>Studying</span></li>)}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ABOUT (approved order: after Validation) */}
         <section id="about" className="chapter chapter--paper" data-ground="paper" aria-labelledby="about-title">
           <div className="wrap">
             <div className="intertitle">
@@ -88,69 +121,6 @@ export default function Home() {
                     <div className="org">{profile.education.school}</div>
                   </li>
                 </ol>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* PRIVILEGE + SCOPE */}
-        <section id="privilege" className="chapter chapter--forest" data-ground="dark" aria-labelledby="privilege-title">
-          <div className="wrap">
-            <div className="intertitle">
-              <h2 id="privilege-title" className="display">Privilege.</h2>
-              <p>Who receives it, what it allows, and how long it lasts.</p>
-            </div>
-            <CaseFile
-              c={case01}
-              pull={
-                <div className="pull" id="scope" data-sc-in>
-                  <p className="display">Role is <span>what.</span></p>
-                  <p className="display">Scope is <span>where.</span></p>
-                  <p>
-                    A Microsoft Entra role decides what an administrator can do. An Administrative Unit decides where
-                    they can do it. Least privilege needs both, so Marcus&apos;s User Administrator role only reaches AU-New York.
-                  </p>
-                </div>
-              }
-            />
-          </div>
-        </section>
-
-        {/* LIFECYCLE */}
-        <section id="lifecycle" className="chapter chapter--paper" data-ground="paper" aria-labelledby="lifecycle-title">
-          <div className="wrap">
-            <div className="intertitle">
-              <h2 id="lifecycle-title" className="display">Lifecycle.</h2>
-              <p>Access should arrive, change and leave with the person.</p>
-            </div>
-            <CaseFile c={case02} />
-          </div>
-        </section>
-
-        {/* VALIDATION */}
-        <section id="validation" className="chapter chapter--dark" data-ground="dark" aria-labelledby="validation-title">
-          <div className="wrap">
-            <div className="intertitle">
-              <h2 id="validation-title" className="display">Validation.</h2>
-              <p>What I have proven, what I am learning, and what comes next.</p>
-            </div>
-            <SkillsLedger />
-
-            <div className="cert" data-sc-in>
-              <div>
-                <h3 className="display" style={{ fontSize: "var(--sc-t-2xl)" }}>Certifications and learning</h3>
-                <p style={{ color: "var(--sc-ink-soft)", marginTop: "var(--sc-4)", maxWidth: "44ch" }}>
-                  No certification is shown here as earned until it is. SC-300 is the current focus, and the
-                  case files above are where I practice its domains.
-                </p>
-              </div>
-              <div className="cert__card">
-                <span className="cert__badge mono">In progress · expected 2026</span>
-                <h3>Microsoft SC-300: Identity and Access Administrator</h3>
-                <p>Microsoft certification exam. Study areas:</p>
-                <ul className="domains" style={{ marginTop: "var(--sc-4)" }}>
-                  {SC300_DOMAINS.map((d) => <li key={d}><span>{d}</span><span className="mono" style={{ color: "var(--sc-ink-soft)" }}>Studying</span></li>)}
-                </ul>
               </div>
             </div>
           </div>
