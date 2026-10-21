@@ -46,8 +46,8 @@ How to resume work on Cameron Johnson's cinematic IAM portfolio. Read this file 
 | Lifecycle (CFG Phase 2) | `LifecycleScene.tsx`, `lifecycle.css`, `content/lifecycle-scene.ts` | Approved |
 | Validation (evidence vault) | `VaultScene.tsx`, `vault.css`, `content/vault-scene.ts` | Approved (smoothness refactor approved 2026-10-21) |
 | About | `AboutScene.tsx`, `about.css`, `content/about-scene.ts` | Approved 2026-10-21 |
-| Certifications | Milestone 1 markup in `src/app/page.tsx` | Next stage |
-| The Access Lounge | Milestone 1 markup in `page.tsx`, `content/lounge.ts` | To redesign |
+| Certifications | Milestone 1 markup in `src/app/page.tsx`; SC-300 card float in `FloatCard.tsx` + `.cert__card` (globals.css) | Approved 2026-10-21 (minimal float only, no cinematic act) |
+| The Access Lounge | Milestone 1 markup in `page.tsx`, `content/lounge.ts` | Storyboard awaiting approval (`scrollcraft/builds/cinematic-redesign/LOUNGE-STORYBOARD.md`, local draft) |
 | Request Access | Milestone 1 markup in `page.tsx`, `RequestRecord.tsx` | To redesign |
 
 The full case files live at `/cfg/phase-1` and `/cfg/phase-2` (`CaseStudyShell`).
@@ -75,6 +75,10 @@ in-act (p95 frame 202 ms → 17.8 ms). The root causes and their fixes, in order
    `--sc-p` (a microtask in the engine's frame), with time-based smoothing (`follow`, τ 45 ms), never a
    per-frame lerp. Write styles through `styleWriter()` so unchanged values cause no style invalidation.
 6. **No layout reads on the scroll path:** the header and rail use the cached geometry in `lib/ground.ts`.
+7. **Idle loops run only in view.** An infinite CSS animation keeps the compositor producing frames even when
+   it is far off screen: the SC-300 float alone took the trackpad run from 1% to 9–13% jank (about 58 → 52 fps)
+   while Validation and About were on screen. Start such animations `paused` and let an IntersectionObserver
+   set `data-in-view` (`FloatCard.tsx`).
 
 **Validation → About hand-off:** About's section overlaps Validation's release (`margin-top: -var(--fh)`) and
 stays hidden until its own progress is above 0. Validation's exit beat (span 7 now; it ends by backing out
@@ -109,9 +113,34 @@ pixel-identical at the switch (checked with an image diff at 1440, 834, 390 and 
 - **About checks:** `node lab/ab-check.mjs` covers reduced motion, keyboard, the dialog and a GHOSTD scan. `lab/` and `review/` are git-ignored, so they are local only.
 - **Before asking for approval:** run `npm run typecheck` and `npm run build`. `next dev` writes to `.next/dev`, so a build can run while the dev server is up.
 
+## Stage 6 (Certifications) and fixes, 2026-10-21
+
+- **Certifications:** Cameron kept the Milestone 1 layout and approved only a minimal enhancement: the SC-300
+  card floats 7px on a 7 s ease-in-out cycle with a faint static green glow (CSS keyframes on `transform`,
+  `will-change: transform`), off under `prefers-reduced-motion`. Status stays "In progress · expected 2026".
+- **Float cost off screen (fixed):** the first version (7aaf996) ran the animation all the time; the A/B in
+  rule 7 above traced the Validation/About drop to it. Now it starts paused and runs only within 25% of the
+  viewport. Trackpad run: float off 57.8–59.1 fps, gated 57.9–58.6, ungated 52.1–55.2.
+- **Validation crash in a zero-size viewport (fixed):** every corridor size is viewport-derived (`--cw`, `--ch`,
+  `--hole` in vault.css). In a hidden or collapsed pane, tab or frame the stage lays out at 0×0, so the bulkhead
+  painter's `at(hole) = 0 / 0` gave `NaN` and `addColorStop(NaN)` threw. The throw happened inside a React
+  effect, so React unmounted the whole page and it stayed blank after the viewport grew. Fix: `texture()`
+  (lib/texture.ts) skips painting a 0×0 surface and keeps the CSS fallback until the next measure (resize or
+  ResizeObserver) paints it. It never fires at a real size: all 55 texture hosts and their pixel hashes are
+  identical with and without the guard at 1440, 800×600 and 390.
+- **1px horizontal overflow on phones (fixed):** the Lounge cover's amber glow (`.lounge__cover::before`,
+  `inset: 8% -6% -6% 8%`) reaches 6% past the cover, past the viewport at 390 and 414 px. `body { overflow-x:
+  clip }` does not contain it: with `html` at `overflow: visible`, body's overflow is propagated to the viewport
+  rather than clipping body's own descendants. On a phone the layout viewport then widened to 391 px, stretching
+  the fixed header. Fix: `overflow-x: clip` on `.chapter--lounge` only (clips exactly at the viewport edge, so
+  nothing visible changes). Sweep: no overflow at 320–1920 px. Any new section with bleed effects needs its own clip.
+- **Checks (lab/, local):** `cert-check.mjs` (float range/period, reduced motion), `float-gate.mjs` (paused off
+  screen), `flow-scroll.mjs <WxH>` (continuous Validation → Lounge: fps per chapter, CLS, errors),
+  `zero-check.mjs` (0×0 viewport), `overflow-sweep.mjs`, `tex-hosts.mjs`.
+
 ## Remaining stages
 
-1. **Certifications:** cinematic redesign. SC-300 shown as in progress; consider carrying the About SC-300 plate into it.
-2. **The Access Lounge:** podcast chapter. No episodes are published yet, so keep it honest about that.
-3. **Request Access:** the contact close.
-4. **Whole-site pass:** run every act in both directions, check performance, metadata, and a final audit for GHOSTD and invented claims. Then hand the merge and deploy decisions to Cameron.
+1. **The Access Lounge:** podcast chapter. No episodes are published yet, so keep it honest about that.
+   Storyboard drafted; build only after Cameron approves it and its open decisions.
+2. **Request Access:** the contact close.
+3. **Whole-site pass:** run every act in both directions, check performance, metadata, and a final audit for GHOSTD and invented claims. Then hand the merge and deploy decisions to Cameron.

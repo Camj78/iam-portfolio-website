@@ -17,6 +17,9 @@ type Draw = (ctx: CanvasRenderingContext2D, w: number, h: number) => void;
 
 /** Paint (or repaint) a texture canvas as the first child of `host`. */
 export function texture(host: HTMLElement, w: number, h: number, density: number, draw: Draw, cls = "tex") {
+  // A collapsed viewport (hidden tab, pane or frame) lays the stage out at 0x0: nothing to paint,
+  // and painters that divide by the size would get NaN. Keep the CSS fallback until the next measure.
+  if (!(w > 0 && h > 0)) return null;
   let c = host.querySelector<HTMLCanvasElement>(`:scope > canvas.${cls}`);
   if (!c) {
     c = document.createElement("canvas");

@@ -8,6 +8,7 @@ import { AccessPathRail } from "@/components/AccessPathRail";
 import { SiteHeader } from "@/components/SiteHeader";
 import { RequestRecord } from "@/components/RequestRecord";
 import { ScrollCraftMount } from "@/components/ScrollCraftMount";
+import { FloatCard } from "@/components/FloatCard";
 import { profile } from "@/content/profile";
 import { lounge, episodes } from "@/content/lounge";
 
@@ -61,14 +62,14 @@ export default function Home() {
                   case files above are where I practice its domains.
                 </p>
               </div>
-              <div className="cert__card">
+              <FloatCard className="cert__card">
                 <span className="cert__badge mono">In progress · expected 2026</span>
                 <h3>Microsoft SC-300: Identity and Access Administrator</h3>
                 <p>Microsoft certification exam. Study areas:</p>
                 <ul className="domains" style={{ marginTop: "var(--sc-4)" }}>
                   {SC300_DOMAINS.map((d) => <li key={d}><span>{d}</span><span className="mono" style={{ color: "var(--sc-ink-soft)" }}>Studying</span></li>)}
                 </ul>
-              </div>
+              </FloatCard>
             </div>
           </div>
         </section>

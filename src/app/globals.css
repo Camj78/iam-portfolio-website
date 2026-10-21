@@ -385,6 +385,9 @@ body { overflow-x: clip; }
   --sc-accent: var(--amber); --sc-accent-ink: #1a1206;
   --sc-hairline: color-mix(in oklab, var(--lounge-ink) 14%, transparent);
   --sc-hairline-strong: color-mix(in oklab, var(--lounge-ink) 26%, transparent);
+  /* The cover glow reaches 6% past the cover; on phones that is past the viewport. body's
+     overflow-x: clip propagates to the viewport instead of clipping, so clip here. */
+  overflow-x: clip;
 }
 .wrap {
   width: 100%; max-width: 86rem; margin-inline: auto;
@@ -552,13 +555,15 @@ body { overflow-x: clip; }
   display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: clamp(2rem, 5vw, 5rem);
   padding-top: var(--sc-7); border-top: 1px solid var(--sc-hairline-strong);
 }
-/* The SC-300 card floats in place: transform-only on its own layer, so the static glow is painted once and never relaid out. */
+/* The SC-300 card floats in place: transform-only on its own layer, so the static glow is painted once and never relaid out.
+   It runs only while near the viewport (FloatCard sets data-in-view): an off-screen infinite animation still costs the acts above. */
 .cert__card {
   border: 1px solid var(--sc-hairline-strong); border-radius: var(--sc-r-lg); padding: clamp(1.25rem, 3vw, 2rem); background: var(--sc-surface);
   box-shadow: var(--sc-e2), var(--sc-edge), 0 28px 64px -30px color-mix(in oklab, var(--sc-accent) 30%, transparent);
-  animation: cert-float 7s ease-in-out infinite;
+  animation: cert-float 7s ease-in-out infinite paused;
   will-change: transform;
 }
+.cert__card[data-in-view] { animation-play-state: running; }
 @keyframes cert-float {
   0%, 100% { transform: translate3d(0, 0, 0); }
   50% { transform: translate3d(0, -7px, 0); }
