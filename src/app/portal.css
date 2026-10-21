@@ -1,0 +1,38 @@
+/* =========================================================================
+   THE EXIT PORTAL — the frame Validation ends on and About opens from.
+   Both stages draw this element at the same place and size (lib/portal.ts),
+   so the switch between the two pinned acts lands on identical pixels.
+   It is rasterized once at the stage's size and only ever scaled up
+   (transform) and darkened inside (opacity), so it costs no repaint.
+   ========================================================================= */
+.portal {
+  --px: 50%; --py: 50%; --pr: 300px;
+  position: absolute; inset: 0; z-index: 9; pointer-events: none;
+  visibility: hidden;
+  transform-origin: var(--px) var(--py);
+  will-change: transform;
+  /* Fallback until the script paints the canvas (lib/portal). */
+  background: radial-gradient(circle at var(--px) var(--py),
+    transparent calc(var(--pr) - 1px),
+    rgb(102 199 147 / 0.75) var(--pr),
+    #1c2c24 calc(var(--pr) + 4px),
+    #121d18 calc(var(--pr) * 1.1),
+    #0a120e calc(var(--pr) * 1.105),
+    #070c0a calc(var(--pr) * 1.7));
+}
+.portal canvas.tex-dark {
+  position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none;
+  opacity: 0; will-change: opacity;
+}
+@media (prefers-reduced-motion: reduce) { .portal { display: none; } }
+
+/* =========================================================================
+   PAINTED BACKDROPS (lib/texture.ts) — shared by the 3D stages.
+   Once a surface has its canvas texture, its CSS gradient is dropped: the
+   canvas is a GPU texture the camera can move without re-rasterizing it.
+   ========================================================================= */
+.has-tex { background: none !important; }
+canvas.tex {
+  position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none;
+  will-change: transform;
+}

@@ -12,7 +12,7 @@ const arg = (k, d) => { const i = process.argv.indexOf(k); return i > -1 ? proce
 const URL = arg("--url", "http://localhost:4500");
 const OUT = path.resolve(arg("--out", arg("--act", "top") === "top" ? "lab/redesign" : `lab/redesign-${arg("--act", "top")}`));
 const ONLY = arg("--only", "")?.split(",").filter(Boolean);
-// Which pinned act to walk: "top" (hero) or "privilege".
+// Which pinned act to walk: "top" (hero), "privilege", "lifecycle", "validation" or "about".
 const ACT = arg("--act", "top");
 const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 
@@ -36,8 +36,12 @@ const SETS = {
     layers: [".lc__sky", ".lc__skyline", ".lc__world", "[data-person=jonathan]", "[data-person=sarah]", "[data-person=david]", ".lc__group--finance", ".lc__fin--1", ".lc__dust"],
   },
   validation: {
-    stops: [0, 0.07, 0.14, 0.2, 0.25, 0.3, 0.36, 0.42, 0.48, 0.54, 0.6, 0.66, 0.72, 0.78, 0.84, 0.9, 1],
+    stops: [0, 0.06, 0.12, 0.17, 0.21, 0.26, 0.31, 0.36, 0.41, 0.46, 0.51, 0.57, 0.62, 0.67, 0.72, 0.78, 0.86, 0.9, 0.94, 0.97, 1],
     layers: [".ev__world", ".ev__door-half--l", ".ev__corridor", ".ev__group", ".ev__shelf", ".ev__fg--l", ".ev__dust"],
+  },
+  about: {
+    stops: [0, 0.03, 0.06, 0.1, 0.17, 0.24, 0.34, 0.42, 0.5, 0.56, 0.62, 0.7, 0.76, 0.82, 0.9, 1],
+    layers: [".ab__world", ".ab__visual .portal", ".ab__obj--a .ab__face", ".ab__obj--b .ab__face", ".ab__obj--c .ab__face", ".ab__host", ".ab__rig--1", ".ab__dust--near"],
   },
   privilege: {
     stops: [0, 0.08, 0.16, 0.24, 0.32, 0.42, 0.5, 0.6, 0.68, 0.78, 0.86, 0.94, 1],

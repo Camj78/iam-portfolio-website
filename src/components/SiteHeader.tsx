@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { profile } from "@/content/profile";
-import { groundAt, type Ground } from "@/lib/ground";
+import { docBox, groundAt, type Ground } from "@/lib/ground";
 
 /** Fixed header that re-inks for the chapter ground beneath it. */
 export function SiteHeader() {
@@ -12,18 +12,22 @@ export function SiteHeader() {
 
   useEffect(() => {
     let raf = 0;
+    // Header height only changes on resize; section positions come from the
+    // cached document geometry (lib/ground). No layout reads while scrolling.
+    let h = -1;
     const read = () => {
       raf = 0;
-      const h = ref.current?.offsetHeight ?? 64;
+      if (h < 0) h = ref.current?.offsetHeight ?? 64;
       setGround(groundAt(h / 2, ref.current));
       const hero = document.getElementById("top");
-      setScrolled(!!hero && hero.getBoundingClientRect().bottom < h);
+      setScrolled(!!hero && docBox(hero).bottom - scrollY < h);
     };
     const kick = () => { if (!raf) raf = requestAnimationFrame(read); };
+    const onResize = () => { h = -1; kick(); };
     read();
     addEventListener("scroll", kick, { passive: true });
-    addEventListener("resize", kick, { passive: true });
-    return () => { cancelAnimationFrame(raf); removeEventListener("scroll", kick); removeEventListener("resize", kick); };
+    addEventListener("resize", onResize, { passive: true });
+    return () => { cancelAnimationFrame(raf); removeEventListener("scroll", kick); removeEventListener("resize", onResize); };
   }, []);
 
   return (

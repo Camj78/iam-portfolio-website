@@ -21,6 +21,7 @@ export const profile = {
       points: [
         "Supports enterprise digital platforms through stakeholder engagement, training initiatives and operational process improvement.",
         "Analyzes platform usage data and user feedback to identify performance gaps, operational risks and improvement opportunities.",
+        "Collaborates with product, digital and connected-services teams to support secure and scalable technology adoption across dealerships.",
       ],
     },
     {

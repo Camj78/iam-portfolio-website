@@ -3,6 +3,7 @@ import { IdentityContinuation } from "@/components/IdentityContinuation";
 import { PrivilegeScene } from "@/components/PrivilegeScene";
 import { LifecycleScene } from "@/components/LifecycleScene";
 import { VaultScene } from "@/components/VaultScene";
+import { AboutScene } from "@/components/AboutScene";
 import { AccessPathRail } from "@/components/AccessPathRail";
 import { SiteHeader } from "@/components/SiteHeader";
 import { RequestRecord } from "@/components/RequestRecord";
@@ -44,61 +45,10 @@ export default function Home() {
         {/* VALIDATION · the evidence vault (redesign) */}
         <VaultScene />
 
-        {/* ---- Below this line: Milestone 1 sections, unchanged pending approval ---- */}
+        {/* ABOUT · the person behind the access (redesign) */}
+        <AboutScene />
 
-        {/* ABOUT (approved order: after Validation) */}
-        <section id="about" className="chapter chapter--paper" data-ground="paper" aria-labelledby="about-title">
-          <div className="wrap">
-            <div className="intertitle">
-              <h2 id="about-title" className="display">About.</h2>
-              <p>Who I am, and why identity is the work I chose.</p>
-            </div>
-            <div className="about">
-              <div data-sc-in>
-                <p className="about__statement">
-                  I spent years keeping business-critical systems running. Now I build the controls that decide
-                  <em> who gets into them</em>, and I document every one like an auditor will read it.
-                </p>
-                <div className="prose">
-                  <p>
-                    I&apos;m an enterprise systems analyst at <strong>Nissan North America</strong> moving into
-                    Identity &amp; Access Management. For more than three years I have supported business-critical
-                    applications through incident investigation, root-cause analysis, requirements and governance
-                    work with application owners.
-                  </p>
-                  <p>
-                    In my own Microsoft Entra ID labs I design and test <strong>identity governance</strong>:
-                    joiner-mover-leaver lifecycle, RBAC, privileged access and least privilege.
-                    Each project records what I configured, how I validated it, and what it does not prove.
-                    I&apos;m currently preparing for <strong>Microsoft SC-300</strong>.
-                  </p>
-                </div>
-                <div className="about__links">
-                  <a className="btn btn--solid" href={profile.linkedin} target="_blank" rel="noopener noreferrer">Connect on LinkedIn</a>
-                  <a className="btn btn--ghost" href={profile.github} target="_blank" rel="noopener noreferrer">GitHub</a>
-                </div>
-              </div>
-              <div data-sc-in>
-                <h3 className="mono" style={{ color: "var(--sc-ink-soft)", margin: "0 0 var(--sc-3)" }}>Experience</h3>
-                <ol className="timeline">
-                  {profile.experience.map((x) => (
-                    <li key={x.title}>
-                      <span className="mono when">{x.years}</span>
-                      <h4>{x.title}</h4>
-                      <div className="org">{x.org}</div>
-                      <ul>{x.points.map((p) => <li key={p}>{p}</li>)}</ul>
-                    </li>
-                  ))}
-                  <li>
-                    <span className="mono when">{profile.education.year}</span>
-                    <h4>{profile.education.degree}</h4>
-                    <div className="org">{profile.education.school}</div>
-                  </li>
-                </ol>
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* ---- Below this line: Milestone 1 sections, unchanged pending approval ---- */}
 
         {/* CERTIFICATIONS (approved order: after About). Milestone 1 content, pending its stage. */}
         <section id="certifications" className="chapter chapter--dark" data-ground="dark" aria-labelledby="certifications-title">

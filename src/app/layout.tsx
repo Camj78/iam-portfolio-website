@@ -6,6 +6,8 @@ import "./cinematic.css";
 import "./privilege.css";
 import "./lifecycle.css";
 import "./vault.css";
+import "./about.css";
+import "./portal.css";
 
 const display = Archivo({
   subsets: ["latin"],

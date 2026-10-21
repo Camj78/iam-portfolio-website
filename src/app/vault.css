@@ -62,11 +62,17 @@
 .ev__arc { list-style: none; margin: 0; padding: 0; }
 .ev__group { display: block; }
 
-/* L1 · corridor: four planes from just in front of the lens to the door */
-.ev__plane { position: absolute; display: block; backface-visibility: visible; opacity: var(--corr, 1); }
+/* L1 · corridor: four planes from just in front of the lens to the door, each
+   cut into eight depth segments (--i) so the script can cull the ones the
+   camera has passed. The pattern is offset per segment, so they read as one. */
+.ev__plane {
+  --L: calc((var(--D) + 400px) / 8);
+  position: absolute; display: block; backface-visibility: visible; opacity: var(--corr, 1);
+}
 .ev__plane--floor, .ev__plane--ceiling {
-  left: calc(-1 * var(--cw)); width: calc(2 * var(--cw)); height: calc(var(--D) + 400px);
-  transform-origin: 50% 0; transform: translateZ(400px) rotateX(-90deg);
+  left: calc(-1 * var(--cw)); width: calc(2 * var(--cw)); height: calc(var(--L) + 2px);
+  transform-origin: 50% 0; transform: translateZ(calc(400px - var(--i, 0) * var(--L))) rotateX(-90deg);
+  background-position: 0 calc(var(--i, 0) * -1 * var(--L));
 }
 .ev__plane--floor {
   top: var(--ch);
@@ -83,8 +89,9 @@
     #080e0b;
 }
 .ev__plane--left, .ev__plane--right {
-  top: calc(-1 * var(--ch)); height: calc(2 * var(--ch)); width: calc(var(--D) + 400px);
-  transform-origin: 0 50%; transform: translateZ(400px) rotateY(90deg);
+  top: calc(-1 * var(--ch)); height: calc(2 * var(--ch)); width: calc(var(--L) + 2px);
+  transform-origin: 0 50%; transform: translateZ(calc(400px - var(--i, 0) * var(--L))) rotateY(90deg);
+  background-position: calc(var(--i, 0) * -1 * var(--L)) 0;
   background:
     linear-gradient(180deg, transparent 17.5%, rgb(102 199 147 / 0.6) 17.8%, rgb(102 199 147 / 0.6) 18.4%, transparent 18.7%),
     linear-gradient(180deg, transparent 81.3%, rgb(102 199 147 / 0.35) 81.6%, rgb(102 199 147 / 0.35) 82%, transparent 82.3%),
@@ -111,6 +118,9 @@
   transform: translateZ(1px);
   opacity: var(--corr, 1);
 }
+/* Once painted (VaultScene), the ring is a canvas texture in the same place. */
+.ev__bulkhead.has-tex::before { display: none; }
+.ev__bulkhead > canvas.tex { transform: translateZ(1px); opacity: var(--corr, 1); }
 .ev__door {
   position: absolute; left: 50%; top: 50%; width: calc(2 * var(--hole)); height: calc(2 * var(--hole));
   translate: -50% -50%; transform-style: preserve-3d;
@@ -159,14 +169,17 @@
 /* L2 · the chamber */
 .ev__chamber-floor, .ev__chamber-wall { position: absolute; display: block; opacity: var(--cham, 1); }
 .ev__panel, .ev__group-label { opacity: var(--cham, 1); }
+/* The chamber floor: ten 520px depth segments of one 6000 × 5200 surface. */
 .ev__chamber-floor {
-  left: -3000px; width: 6000px; top: var(--ch); height: 5200px;
+  left: -3000px; width: 6000px; top: var(--ch); height: 522px;
   transform-origin: 50% 0;
-  transform: translateZ(calc(var(--zc) + 2400px)) rotateX(-90deg);
+  transform: translateZ(calc(var(--zc) + 2400px - var(--i, 0) * 520px)) rotateX(-90deg);
   background:
     radial-gradient(40% 32% at 50% 46%, rgb(102 199 147 / 0.16), transparent 70%),
     repeating-linear-gradient(90deg, rgb(236 231 220 / 0.05) 0 1px, transparent 1px 140px),
     repeating-linear-gradient(180deg, rgb(236 231 220 / 0.05) 0 1px, transparent 1px 140px);
+  background-size: 100% 5200px;
+  background-position: 0 calc(var(--i, 0) * -520px);
 }
 .ev__chamber-wall {
   left: -3000px; width: 6000px; top: -1800px; height: 3600px;
@@ -310,7 +323,7 @@
    LIVE
    ========================================================================= */
 @media (prefers-reduced-motion: no-preference) {
-  :root.js .ev { height: 600vh; }
+  :root.js .ev { height: 700vh; }
   :root.js .ev__stage { position: sticky; top: 0; height: var(--fh); display: block; padding: 0; }
   :root.js .ev__visual { position: absolute; inset: 0; height: auto; }
   :root.js .ev__copy { position: absolute; left: var(--copy-left); top: 17%; width: min(26rem, 28vw); padding: 0; }
