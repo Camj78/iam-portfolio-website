@@ -317,10 +317,11 @@ body { overflow-x: clip; }
 .rail {
   position: fixed; z-index: calc(var(--sc-z-chrome) - 1);
   left: var(--sc-gutter); top: 50%; translate: 0 -50%;
-  opacity: 0; pointer-events: none;
-  transition: opacity var(--sc-d-base) var(--sc-ease-out);
+  opacity: 0; pointer-events: none; visibility: hidden;
+  /* visibility follows the fade out, so a hidden rail leaves the tab order and the accessibility tree */
+  transition: opacity var(--sc-d-base) var(--sc-ease-out), visibility 0s linear var(--sc-d-base);
 }
-.rail[data-visible] { opacity: 1; pointer-events: auto; }
+.rail[data-visible] { opacity: 1; pointer-events: auto; visibility: visible; transition-delay: 0s; }
 .rail ol { list-style: none; margin: 0; padding: 0; position: relative; }
 .rail ol::before {
   content: ""; position: absolute; left: 4px; top: 0.9rem; bottom: 0.9rem; width: 1px;
@@ -578,30 +579,150 @@ body { overflow-x: clip; }
 @media (max-width: 860px) { .cert { grid-template-columns: 1fr; } }
 
 /* --------------------------------------------------- request access */
-.request { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2rem, 6vw, 6rem); align-items: start; }
-.request h2 { font-size: clamp(3rem, 8vw, 7.5rem); font-stretch: 118%; }
-.request .lede { margin-top: var(--sc-6); color: var(--sc-ink-soft); }
-.record {
-  border-radius: var(--sc-r-lg); background: var(--sc-surface);
-  border: 1px solid var(--sc-hairline); box-shadow: var(--sc-e3), var(--sc-edge);
-  padding: clamp(1.25rem, 3vw, 2.25rem);
+/* Certifications' composition (grid, hairline, gaps) with an ACCESS GRANTED terminal in the card's place.
+   No pinned act: a CSS float like the SC-300 card and one opacity bloom when the status resolves. */
+.chapter--contact { overflow-x: clip; }
+@media (min-width: 900px) and (min-height: 640px) {
+  .chapter--contact { min-height: 100svh; display: grid; align-content: center; }
 }
-.record dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 0; }
-.record dt, .record dd { padding: 0.85rem 0; border-top: 1px solid var(--sc-hairline); margin: 0; }
-.record dt { color: var(--sc-ink-soft); padding-right: 1.5rem; }
-.record dd { font-weight: 500; }
-.record .state { display: inline-flex; align-items: center; gap: 0.5rem; }
-.record .state::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--felt); transition: background-color 400ms var(--sc-ease-out); }
-.record[data-approved] .state::before { background: var(--sc-accent); }
-.record .state b { font-weight: 600; }
-.record .state .pending { display: inline; }
-.record .state .approved { display: none; color: var(--sc-accent); }
-.record[data-approved] .state .pending { display: none; }
-.record[data-approved] .state .approved { display: inline; }
-.record__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-top: var(--sc-6); }
-.record__actions .btn { justify-content: center; }
-@media (max-width: 860px) { .request { grid-template-columns: 1fr; } }
-@media (max-width: 420px) { .record__actions { grid-template-columns: 1fr; } }
+.request {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: clamp(2rem, 5vw, 5rem); align-items: center;
+  padding-top: var(--sc-7); border-top: 1px solid var(--sc-hairline-strong);
+}
+.request__kicker { margin: 0 0 var(--sc-5); color: var(--sc-accent); }
+.request h2 { font-size: clamp(2.8rem, 1.6rem + 3.6vw, 5.4rem); font-stretch: 118%; }
+.request__statement {
+  margin: var(--sc-5) 0 0; max-width: 22ch; font-size: var(--sc-t-xl); font-weight: 500;
+  line-height: 1.18; letter-spacing: -0.02em; text-wrap: balance;
+}
+.request .lede { margin-top: var(--sc-5); color: var(--sc-ink-soft); font-size: var(--sc-t-base); line-height: 1.6; max-width: 46ch; }
+
+/* The terminal: the Evidence Vault's panel material at the SC-300 card's radius. */
+.terminal {
+  --led: var(--sc-accent);
+  position: relative; justify-self: end; width: 100%; max-width: 34rem;
+  animation: terminal-float 7.5s ease-in-out infinite paused;
+  will-change: transform;
+}
+.terminal__panel {
+  container-type: inline-size;
+  border-radius: var(--sc-r-lg); border: 1px solid rgb(102 199 147 / 0.28);
+  background: linear-gradient(180deg, rgb(26 39 32 / 0.96), rgb(14 22 18 / 0.97));
+  box-shadow:
+    inset 0 1px 0 rgb(236 231 220 / 0.1),
+    0 24px 48px -20px rgb(0 0 0 / 0.9),
+    0 28px 64px -30px color-mix(in oklab, var(--sc-accent) 30%, transparent);
+}
+.terminal[data-in-view] { animation-play-state: running; }
+.terminal[data-in-view]:is(:hover, :focus-within) { animation-play-state: paused; }
+@keyframes terminal-float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -6px, 0); }
+}
+/* The emerald bloom behind the panel: opacity only, on its own layer (painted once). */
+.terminal::before {
+  content: ""; position: absolute; inset: -12% -8%; z-index: -1; pointer-events: none;
+  background: radial-gradient(50% 50% at 50% 42%, rgb(102 199 147 / 0.2), transparent 70%);
+  opacity: 0.4; will-change: opacity;
+}
+.terminal[data-state="pending"]::before { opacity: 0; }
+.terminal[data-state="granted"]::before { animation: terminal-bloom 1.1s var(--sc-ease-out) both; }
+@keyframes terminal-bloom { 0% { opacity: 0; } 40% { opacity: 1; } 100% { opacity: 0.4; } }
+
+.terminal__bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: 0.95rem clamp(1.25rem, 2.6vw, 1.75rem); border-bottom: 1px solid var(--sc-hairline);
+  color: var(--sc-ink-soft);
+}
+.terminal__bar .mono { letter-spacing: 0.16em; }
+.terminal__led {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--led);
+  box-shadow: 0 0 0 3px rgb(102 199 147 / 0.14);
+  transition: background-color 500ms var(--sc-ease-out), box-shadow 500ms var(--sc-ease-out);
+}
+.terminal__status {
+  margin: 0; padding: clamp(1.25rem, 2.6vw, 1.75rem) clamp(1.25rem, 2.6vw, 1.75rem) 0;
+  font-family: var(--sc-font-mono); font-size: clamp(0.78rem, 0.7rem + 0.3vw, 0.92rem); letter-spacing: 0.18em; text-transform: uppercase;
+}
+.terminal__state { display: inline-grid; align-items: center; padding: 0.55rem 0.9rem 0.55rem 2.1rem; position: relative; border-radius: var(--sc-r-sm); }
+/* the granted tint and dot; both sit on opacity so the resolve never repaints the panel */
+.terminal__state::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  border: 1px solid rgb(102 199 147 / 0.3); background: rgb(102 199 147 / 0.08);
+  transition: opacity 600ms var(--sc-ease-out);
+}
+.terminal__state::after {
+  content: ""; position: absolute; left: 0.9rem; top: 50%; width: 8px; height: 8px; margin-top: -4px; border-radius: 50%;
+  background: var(--led); box-shadow: 0 0 10px 1px rgb(102 199 147 / 0.55);
+  transition: background-color 500ms var(--sc-ease-out), box-shadow 500ms var(--sc-ease-out);
+}
+.terminal__state > span { grid-area: 1 / 1; transition: opacity 320ms var(--sc-ease-out); }
+.terminal__state .granted { color: var(--sc-accent); }
+.terminal__state .pending { color: var(--felt); opacity: 0; }
+.terminal[data-state="pending"] { --led: var(--felt); }
+.terminal[data-state="pending"] .terminal__led { box-shadow: 0 0 0 3px rgb(200 162 124 / 0.14); }
+.terminal[data-state="pending"] .terminal__state::before { opacity: 0; }
+.terminal[data-state="pending"] .terminal__state::after { box-shadow: 0 0 0 0 transparent; }
+.terminal[data-state="pending"] .terminal__state .pending { opacity: 1; }
+.terminal[data-state="pending"] .terminal__state .granted { opacity: 0; }
+
+.terminal__primary {
+  position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.6rem;
+  padding: var(--sc-6) clamp(1.25rem, 2.6vw, 1.75rem) 0;
+}
+.terminal__email { min-height: 3.6rem; padding-inline: 1.25rem; font-size: var(--sc-t-base); }
+.terminal__addr {
+  margin-left: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis;
+  font-family: var(--sc-font-mono); font-size: var(--sc-t-xs); font-weight: 500; letter-spacing: 0.02em; opacity: 0.78;
+}
+.terminal__copy { display: none; min-height: 3.6rem; padding-inline: 1rem; color: var(--sc-ink-soft); cursor: pointer; background: none; font-family: inherit; }
+:root.js .terminal__copy { display: inline-flex; }
+@media (hover: hover) and (pointer: fine) { .terminal__copy:hover { color: var(--sc-ink); } }
+/* Copy feedback sits in the gap below the row, so it never moves the layout. */
+.terminal__note {
+  position: absolute; right: clamp(1.25rem, 2.6vw, 1.75rem); top: 100%; margin: 0.5rem 0 0; text-align: right;
+  font-family: var(--sc-font-mono); font-size: var(--sc-t-xs); letter-spacing: 0.04em; color: var(--sc-accent);
+}
+.terminal__note[data-kind="failed"] { color: var(--sc-ink); left: clamp(1.25rem, 2.6vw, 1.75rem); }
+.terminal__sel { user-select: all; color: var(--sc-accent); }
+.terminal__links {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem;
+  padding: 2.4rem clamp(1.25rem, 2.6vw, 1.75rem) clamp(1.25rem, 2.6vw, 1.75rem);
+}
+.terminal__links .btn { justify-content: center; padding-inline: 0.9rem; }
+.terminal__links .btn svg { opacity: 0.7; }
+
+@media (max-width: 1100px) and (min-width: 900px) {
+  .request { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+}
+@media (max-width: 899px) {
+  .request { grid-template-columns: 1fr; align-items: start; }
+  .terminal { justify-self: start; max-width: 36rem; }
+}
+/* A narrow terminal (tablets, phones) puts the address under "Email" so it is never truncated. */
+@container (max-width: 33rem) {
+  .terminal__email { display: grid; grid-template-columns: auto 1fr; column-gap: 0.7em; row-gap: 0.15rem; padding-block: 0.7rem; justify-content: start; }
+  .terminal__email svg { grid-row: span 2; }
+  .terminal__addr { margin-left: 0; }
+}
+@container (max-width: 25rem) {
+  .terminal__primary { grid-template-columns: 1fr; }
+  .terminal__copy { justify-self: start; min-height: 2.75rem; }
+  .terminal__note { right: auto; left: clamp(1.25rem, 2.6vw, 1.75rem); text-align: left; }
+  .terminal__links { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .terminal { animation-name: terminal-float-sm; }
+}
+@keyframes terminal-float-sm {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -5px, 0); }
+}
+/* last, so it also overrides the phone float above */
+@media (prefers-reduced-motion: reduce) {
+  .terminal { animation: none; will-change: auto; }
+  .terminal::before { will-change: auto; }
+}
 
 .site-footer { background: var(--sc-canvas); color: var(--sc-ink-soft); padding: var(--sc-7) 0 calc(var(--sc-7) + 4rem); font-size: var(--sc-t-sm); border-top: 1px solid var(--sc-hairline); }
 .site-footer .wrap { display: flex; flex-wrap: wrap; gap: 1rem 2rem; justify-content: space-between; align-items: center; }

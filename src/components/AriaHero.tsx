@@ -200,7 +200,7 @@ export function AriaHero() {
           <div className="hero__actions">
             <a className="btn btn--solid" href="#privilege">View case files</a>
             <a className="btn btn--ghost" href={profile.resume} download>
-              Résumé (PDF)
+              Resumé (PDF)
             </a>
           </div>
         </div>

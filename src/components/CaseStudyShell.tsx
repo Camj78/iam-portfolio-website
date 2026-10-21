@@ -33,7 +33,7 @@ export function CaseStudyShell({ c, back, pull }: { c: Case; back: string; pull?
             <a href="/">Portfolio</a>
             <a href={profile.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
             <a href={profile.github} target="_blank" rel="noopener noreferrer">GitHub</a>
-            <a href={profile.resume} download>Résumé (PDF)</a>
+            <a href={profile.resume} download>Resumé (PDF)</a>
           </nav>
         </div>
       </footer>

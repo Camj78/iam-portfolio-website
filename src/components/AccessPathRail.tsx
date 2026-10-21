@@ -20,9 +20,11 @@ export function AccessPathRail() {
     const read = () => {
       raf = 0;
       const vh = innerHeight, y = scrollY;
-      // Hidden while the pinned hero owns the screen; it arrives as the pin lets go.
+      // Hidden while the pinned hero owns the screen; it arrives as the pin lets go. The path ends at
+      // Validation, so it leaves again where About's act takes over (the shared portal frame).
       const hero = document.getElementById("top");
-      setVisible(!!hero && docBox(hero).bottom - y < vh * 0.55);
+      const after = document.getElementById("about");
+      setVisible(!!hero && docBox(hero).bottom - y < vh * 0.55 && !(after && docBox(after).top - y <= 0));
 
       let idx = -1;
       accessPath.forEach((s, i) => {

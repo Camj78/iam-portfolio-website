@@ -78,14 +78,17 @@ export default function Home() {
         <LoungeScene />
 
         {/* REQUEST ACCESS */}
-        <section id="contact" className="chapter chapter--forest" data-ground="dark" aria-labelledby="contact-title">
+        <section id="contact" className="chapter chapter--forest chapter--contact" data-ground="dark" aria-labelledby="contact-title">
           <div className="wrap">
-            <div className="request">
-              <div>
+            <div className="request" data-sc-in>
+              <div className="request__copy">
+                <p className="mono request__kicker">Final chapter · Connect</p>
                 <h2 id="contact-title" className="display">Request access.</h2>
+                <p className="request__statement">You&rsquo;ve seen the controls. Now let&rsquo;s build something secure.</p>
                 <p className="lede">
-                  Hiring for IAM Analyst, IAM Engineer or identity governance? Email or LinkedIn is the fastest
-                  route. The résumé has the full history.
+                  I&rsquo;m moving into Identity and Access Management, focused on IAM Analyst, IAM Engineer and
+                  identity governance roles. Whether you&rsquo;re hiring, recruiting, working in IAM or have a project
+                  in mind, email is the fastest route. My resumé has the full history.
                 </p>
               </div>
               <RequestRecord />
@@ -101,7 +104,7 @@ export default function Home() {
             <a href={profile.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
             <a href={profile.github} target="_blank" rel="noopener noreferrer">GitHub</a>
             <a href={profile.portfolioRepo} target="_blank" rel="noopener noreferrer">Site source</a>
-            <a href={profile.resume} download>Résumé (PDF)</a>
+            <a href={profile.resume} download>Resumé (PDF)</a>
             <a href="#top">Back to top</a>
           </nav>
         </div>

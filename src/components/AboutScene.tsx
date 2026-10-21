@@ -395,7 +395,7 @@ export function AboutScene() {
           <div className="ab__close" data-sc-cue="0.87 1.3 0.1">
             <p className="ab__statement">{closing}</p>
             <div className="ab__actions">
-              <a className="btn btn--ghost" href={profile.resume} download>Résumé (PDF)</a>
+              <a className="btn btn--ghost" href={profile.resume} download>Resumé (PDF)</a>
               <a className="ab__next" href="#certifications">Next · Certifications <span aria-hidden="true">↓</span></a>
             </div>
           </div>
@@ -556,7 +556,7 @@ export function AboutScene() {
             </div>
 
             <div className="ab__sheet-links">
-              <a className="btn btn--solid" href={profile.resume} download>Résumé (PDF)</a>
+              <a className="btn btn--solid" href={profile.resume} download>Resumé (PDF)</a>
               <a className="btn btn--ghost" href={profile.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
               <a className="btn btn--ghost" href={profile.github} target="_blank" rel="noopener noreferrer">GitHub</a>
             </div>

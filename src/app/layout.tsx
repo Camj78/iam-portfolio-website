@@ -49,8 +49,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${display.variable} ${text.variable} ${mono.variable}`} suppressHydrationWarning>
       <head>
-        {/* Lets the hero lay out its pinned form before hydration, so there is no jump. */}
-        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+        {/* Lets the hero lay out its pinned form before hydration, so there is no jump. On the home page,
+            a #hash load, refresh or return jumps instead of gliding through acts that are not built yet;
+            lib/landing.ts lands the position once the engine has sized them and restores smooth scrolling. */}
+        <script dangerouslySetInnerHTML={{ __html: "(function(d){d.classList.add('js');try{var n=performance.getEntriesByType('navigation')[0];if(location.pathname==='/'&&(location.hash||(n&&n.type!=='navigate')))d.style.scrollBehavior='auto'}catch(e){}})(document.documentElement)" }} />
       </head>
       <body>{children}</body>
     </html>

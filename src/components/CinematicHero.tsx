@@ -420,7 +420,7 @@ export function CinematicHero() {
         </div>
         <div className="cine__cta">
           <a className="btn btn--solid" href="#identity">Enter the CFG lab</a>
-          <a className="btn btn--ghost" href={profile.resume} download>Résumé (PDF)</a>
+          <a className="btn btn--ghost" href={profile.resume} download>Resumé (PDF)</a>
         </div>
 
         <div className="cine__identity-plane">

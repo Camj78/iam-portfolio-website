@@ -9,7 +9,7 @@ How to resume work on Cameron Johnson's cinematic IAM portfolio. Read this file 
 - **Branch:** `feature/cinematic-redesign`. Never merge into `main`, push to any other branch, or deploy (`vercel --prod`) without Cameron's explicit approval.
 - **Dev server:** `npm run dev`, which serves http://localhost:4500. Node lives at `~/.fnm/node-versions/v20.20.0/installation/bin` (the shell may not load fnm).
 - **Large pushes:** use `git -c http.postBuffer=524288000 push`.
-- **Approved checkpoints:** the local tags `checkpoint/hero-approved`, `checkpoint/lifecycle-approved`, `checkpoint/validation-approved`, `checkpoint/about-approved`, `checkpoint/certifications-approved` and `checkpoint/lounge-approved`.
+- **Approved checkpoints:** the local tags `checkpoint/hero-approved`, `checkpoint/lifecycle-approved`, `checkpoint/validation-approved`, `checkpoint/about-approved`, `checkpoint/certifications-approved`, `checkpoint/lounge-approved` and `checkpoint/request-approved`.
 
 ## Rules that never bend
 
@@ -37,7 +37,8 @@ How to resume work on Cameron Johnson's cinematic IAM portfolio. Read this file 
   - Lightning CSS drops `translate:` when the same rule also sets `transform`.
   - A CSS custom property derived with `calc()` resolves where it is declared, so set JS-driven geometry variables on the element that uses them.
 - **A.R.I.A.:** three transparent poses in `public/aria/optimized` (`left`, `front` and `right`, at 760 and 480 px), blended by `src/lib/frame-player.ts`. Frame index 0 looks toward screen-left, 2 toward screen-right.
-- **Navigation:** the `AccessPathRail` covers Identity through Validation and becomes a pill at the bottom of the screen at 1180px wide and below. `SiteHeader` changes its colours based on the `data-ground` of the section underneath it.
+- **Navigation:** the `AccessPathRail` covers Identity through Validation and becomes a pill at the bottom of the screen at 1180px wide and below. It shows once the hero's pin lets go and fades out where About's act takes over (the shared portal frame); hidden, it is `visibility: hidden`, so it leaves the tab order and the accessibility tree. `.wrap` keeps its rail inset everywhere, so nothing moves when it goes. `SiteHeader` changes its colours based on the `data-ground` of the section underneath it.
+- **Hash links and restored positions:** `lib/landing.ts`, called by `ScrollCraftMount` right after the engine mounts. See "Navigation fixes" below.
 
 | Chapter (homepage order) | Component and styles | Status |
 |---|---|---|
@@ -48,7 +49,7 @@ How to resume work on Cameron Johnson's cinematic IAM portfolio. Read this file 
 | About | `AboutScene.tsx`, `about.css`, `content/about-scene.ts` | Approved 2026-10-21 |
 | Certifications | Milestone 1 markup in `src/app/page.tsx`; SC-300 card float in `FloatCard.tsx` + `.cert__card` (globals.css) | Approved 2026-10-21 (minimal float only, no cinematic act) |
 | The Access Lounge | `LoungeScene.tsx`, `lounge.css`, `content/lounge.ts`, `content/lounge-plates.json` | Approved 2026-10-21 (storyboard: `scrollcraft/builds/cinematic-redesign/LOUNGE-STORYBOARD.md`) |
-| Request Access | Milestone 1 markup in `page.tsx`, `RequestRecord.tsx` | To redesign |
+| Request Access | `#contact` in `page.tsx`, `RequestRecord.tsx` (the terminal), request-access block in `globals.css` | Approved 2026-10-21 (storyboard: `scrollcraft/builds/cinematic-redesign/REQUEST-STORYBOARD.md`) |
 
 The full case files live at `/cfg/phase-1` and `/cfg/phase-2` (`CaseStudyShell`).
 
@@ -172,7 +173,65 @@ pixel-identical at the switch (checked with an image diff at 1440, 834, 390 and 
 - **Checks (lab/, local):** `lounge-shots.mjs <WxH> [p,…] [--reduce] [--out dir]`, `lounge-frame.mjs` (framing
   audit), `lounge-perf.mjs`, `lounge-a11y.mjs`, `record-lounge.mjs --out review/lounge/<stamp>/….webm`.
 
+## Request Access (Stage 8), approved 2026-10-21
+
+- **Composition:** Certifications' grid (`minmax(0, 1fr) minmax(0, 1.2fr)`, top hairline), about one screen tall on desktop
+  (`.chapter--contact`: `min-height: 100svh` at ≥ 900 × 640). Left: `FINAL CHAPTER · CONNECT`, "Request access.", the
+  statement "You've seen the controls. Now let's build something secure.", and the invitation. Right: the terminal.
+- **The terminal (`RequestRecord.tsx`):** the Vault's panel material at the SC-300 card's radius. Title bar `ACCESS REQUEST`,
+  one status line, then Email (the only solid button, full address shown), Copy, LinkedIn, GitHub (the CFG lab repo,
+  `CFG_REPO`), Resumé (download). No record rows, ticket numbers or timestamps: ACCESS GRANTED is a metaphor, not a transaction.
+  A container query (`@container (max-width: 33rem)`) puts the address under "Email" so it is never truncated.
+- **Motion:** `.terminal` floats 6 px over 7.5 s (5 px at ≤ 520 px), FloatCard's pattern: paused until near view, and
+  paused on `:hover` / `:focus-within`. The server renders ACCESS GRANTED; JS arms PENDING REVIEW only when motion is allowed
+  and the terminal starts off screen, and resolves it once at 60% in view (dot, text crossfade, one opacity bloom on
+  `.terminal::before`). Reduced motion and no-JS: granted, static. Screen readers get a fixed "Status: access granted".
+- **Copy email:** Clipboard API, then a `execCommand` fallback, then a visible "Couldn't copy" with the address selectable.
+  Feedback in a `role="status"` line positioned in the gap below the row (no layout shift). Hidden without JS (`:root.js`).
+- **Hand-off:** the Lounge ends amber (IN PRODUCTION); the close answers emerald (ACCESS GRANTED). The studio-floor
+  gradient (`.lg + .chapter--forest` in lounge.css) is unchanged. The section clips its own overflow (the bloom).
+- **Spelling standard (site-wide, user-facing only):** "Resumé" / "resumé". Code identifiers, file names, URLs, code
+  comments and the PDF are unchanged.
+- **Link audit (2026-10-21):** all 18 GitHub links on the rendered site and in the Vault dialogs point to
+  `cashville-financial-group-iam` (or the profile / site source) and return 200; every evidence path is a redacted
+  `optimized/` copy; the built HTML has no GHOSTD. `ghostd-identity-governance-implementation` is the GHOSTD project, not CFG.
+- **Measured (Iris Plus 640, 2×, continuous wheel, mains power):** Lounge → Request Access → page end and back 60 fps in every
+  band, 8 s hold on the terminal 60 fps, max frame 17.9 ms, CLS 0; no overflow at 360–1440 px; touch targets ≥ 44 px.
+  On battery below 20% macOS caps Chrome at 30 fps: plug in before measuring.
+- **Checks (lab/, local):** `contact-check.mjs <WxH> [--reduce]` (grant sequence, float range, hover/focus pause, tab order,
+  copy, overflow), `contact-nojs.mjs`, `contact-flow.mjs` (perf, no capture), `record-contact.mjs`.
+
+## Navigation fixes, approved 2026-10-21
+
+- **Direct `#hash`, refresh and back/forward (`lib/landing.ts`):** the server page is shorter than the live one (the engine
+  gives the Lounge its pinned height after mount, +8,100 px at 1440 × 900), so the browser's jump to `#contact`, or its
+  restore of a refreshed or returning position, landed short for anything below the Lounge. Now:
+  - `rememberScroll()` tracks the last scroll position and saves it on `pagehide` per history entry
+    (`navigation.currentEntry.key`, falling back to the URL). It does not read `scrollY` at `pagehide`: the page can already be
+    relaying out then.
+  - `land()`, called right after `ScrollCraft.mount`: on `reload` / `back_forward` it restores the saved position; otherwise it
+    goes to the `#hash` element. It re-aligns on every `document.body` resize until the first wheel, touch, pointer or key
+    input (or `hashchange`). No timers, no offsets.
+  - The head script in `layout.tsx` sets `scroll-behavior: auto` inline on the home page for hash / reload / back-forward
+    loads, so the browser does not glide through unbuilt acts; `land()` removes it on the first input.
+  - Same-document jumps (header Contact, back/forward between hashes) are left to the browser.
+- **Verified:** direct loads of all eight chapter hashes land at 0; refresh restores the exact spot with and without a hash;
+  header Contact, back and forward; back from a case file returns to the exact position. Desktop, 390 px and reduced motion.
+  Validation → About → Certifications → Lounge measured 59.4 fps (committed code 59.1 under the same conditions), CLS 0.
+- **Checks (lab/, local):** `nav-hash.mjs <WxH> [--reduce]` (the full matrix; each direct load starts from `about:blank`,
+  because a hash-only `goto` is a same-document jump), `nav-back.mjs`, `rail-check.mjs`, `record-rail.mjs`.
+  Harness note: in the long phone matrix one "back after header" step stays put on both the old and new code; the same
+  sequence passes on its own (`nav-back2.mjs`). It is the test's history stack, not the site.
+
+## Pre-launch checkpoints (Cameron)
+
+1. **Email:** camjohnson78@gmail.com is in `profile.ts` but not approved for publication until Cameron confirms it.
+2. **LinkedIn:** Cameron verifies the link by hand (LinkedIn refuses automated checks).
+3. **Resumé PDF:** still contains the "GHOSTD Corporation" project section and lists Access Reviews. Kept temporarily;
+   do not edit it without Cameron's approval.
+4. Untracked leftovers from the Lounge stage (`public/lounge/optimized/lounge-edge-l/r.webp`, unreferenced, and
+   `assets-src/lounge/composite.jpg`) are not committed; ask before deleting.
+
 ## Remaining stages
 
-1. **Request Access:** the contact close.
-2. **Whole-site pass:** run every act in both directions, check performance, metadata, and a final audit for GHOSTD and invented claims. Then hand the merge and deploy decisions to Cameron.
+1. **Whole-site pass:** run every act in both directions, check performance, metadata, and a final audit for GHOSTD and invented claims, plus the recruiter-experience review. Then hand the merge and deploy decisions to Cameron.

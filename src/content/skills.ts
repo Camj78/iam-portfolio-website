@@ -14,7 +14,7 @@ export type Skill = {
 
 const c1 = { label: "CFG Phase 1", href: "/cfg/phase-1" };
 const c2 = { label: "CFG Phase 2", href: "/cfg/phase-2" };
-const cv = { label: "Résumé", href: "/resume/Cameron-Johnson-IAM-Resume.pdf" };
+const cv = { label: "Resumé", href: "/resume/Cameron-Johnson-IAM-Resume.pdf" };
 
 export const skills: Skill[] = [
   { name: "Microsoft Entra ID administration", area: "Identity", status: "demonstrated", evidence: c1 },
