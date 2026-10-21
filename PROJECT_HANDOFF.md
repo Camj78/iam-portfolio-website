@@ -44,8 +44,8 @@ How to resume work on Cameron Johnson's cinematic IAM portfolio. Read this file 
 | Hero → Identity | `CinematicHero.tsx`, `IdentityContinuation.tsx`, `cinematic.css` | Approved |
 | Privilege (CFG Phase 1) | `PrivilegeScene.tsx`, `privilege.css`, `content/privilege-scene.ts` | Approved |
 | Lifecycle (CFG Phase 2) | `LifecycleScene.tsx`, `lifecycle.css`, `content/lifecycle-scene.ts` | Approved |
-| Validation (evidence vault) | `VaultScene.tsx`, `vault.css`, `content/vault-scene.ts` | Design approved; **smoothness refactor awaiting Cameron's in-browser review (not committed)** |
-| About | `AboutScene.tsx`, `about.css`, `content/about-scene.ts` | **Built + smoothness refactor; awaiting Cameron's in-browser review (not committed)** |
+| Validation (evidence vault) | `VaultScene.tsx`, `vault.css`, `content/vault-scene.ts` | Approved (smoothness refactor approved 2026-10-21) |
+| About | `AboutScene.tsx`, `about.css`, `content/about-scene.ts` | Approved 2026-10-21 |
 | Certifications | Milestone 1 markup in `src/app/page.tsx` | Next stage |
 | The Access Lounge | Milestone 1 markup in `page.tsx`, `content/lounge.ts` | To redesign |
 | Request Access | Milestone 1 markup in `page.tsx`, `RequestRecord.tsx` | To redesign |
@@ -111,8 +111,7 @@ pixel-identical at the switch (checked with an image diff at 1440, 834, 390 and 
 
 ## Remaining stages
 
-1. **Validation + About smoothness:** Cameron scrolls them himself at http://localhost:4500 and approves; then commit and push to `feature/cinematic-redesign`. Review files: `review/smoothness/`.
-2. **Certifications:** cinematic redesign. SC-300 shown as in progress; consider carrying the About SC-300 plate into it.
-3. **The Access Lounge:** podcast chapter. No episodes are published yet, so keep it honest about that.
-4. **Request Access:** the contact close.
-5. **Whole-site pass:** run every act in both directions, check performance, metadata, and a final audit for GHOSTD and invented claims. Then hand the merge and deploy decisions to Cameron.
+1. **Certifications:** cinematic redesign. SC-300 shown as in progress; consider carrying the About SC-300 plate into it.
+2. **The Access Lounge:** podcast chapter. No episodes are published yet, so keep it honest about that.
+3. **Request Access:** the contact close.
+4. **Whole-site pass:** run every act in both directions, check performance, metadata, and a final audit for GHOSTD and invented claims. Then hand the merge and deploy decisions to Cameron.
