@@ -552,7 +552,18 @@ body { overflow-x: clip; }
   display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: clamp(2rem, 5vw, 5rem);
   padding-top: var(--sc-7); border-top: 1px solid var(--sc-hairline-strong);
 }
-.cert__card { border: 1px solid var(--sc-hairline-strong); border-radius: var(--sc-r-lg); padding: clamp(1.25rem, 3vw, 2rem); background: var(--sc-surface); box-shadow: var(--sc-e2), var(--sc-edge); }
+/* The SC-300 card floats in place: transform-only on its own layer, so the static glow is painted once and never relaid out. */
+.cert__card {
+  border: 1px solid var(--sc-hairline-strong); border-radius: var(--sc-r-lg); padding: clamp(1.25rem, 3vw, 2rem); background: var(--sc-surface);
+  box-shadow: var(--sc-e2), var(--sc-edge), 0 28px 64px -30px color-mix(in oklab, var(--sc-accent) 30%, transparent);
+  animation: cert-float 7s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes cert-float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -7px, 0); }
+}
+@media (prefers-reduced-motion: reduce) { .cert__card { animation: none; will-change: auto; } }
 .cert__badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.3rem 0.7rem; border-radius: var(--sc-r-pill); border: 1.5px dashed var(--sc-accent); color: var(--sc-accent); }
 .cert__card h3 { font-size: var(--sc-t-xl); margin: var(--sc-4) 0 0.25rem; letter-spacing: -0.02em; line-height: 1.15; }
 .cert__card p { margin: 0; color: var(--sc-ink-soft); }
