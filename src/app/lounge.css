@@ -1,0 +1,240 @@
+/* =========================================================================
+   THE ACCESS LOUNGE — entering the studio
+   Default (no JS, reduced motion): a still of the studio with the copy
+   beside it, the sign reading IN PRODUCTION.
+   Live: one pinned act (span 5, 4 on phones). LoungeScene.tsx moves flat
+   depth planes cut from the podcast cover; each gets one 2D transform.
+   The script sets --bx/--by/--bw/--bh (the studio frame on the stage),
+   --vo (the vanishing point) and --desk-y (the desk's front edge).
+   ========================================================================= */
+
+.lg {
+  --fh: max(100svh, 34rem);
+  --copy-left: var(--sc-gutter);
+  --ts: clamp(2.2rem, 3.9vw, 4rem);        /* title size */
+  position: relative;
+  background: var(--lounge);
+  color: var(--lounge-ink);
+}
+@media (min-width: 1181px) { .lg { --copy-left: calc(var(--sc-gutter) + var(--rail-w)); } }
+
+/* ---------------------------------------------------------------- static */
+.lg__stage {
+  display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: clamp(2rem, 5vw, 4.5rem); align-items: start;
+  padding: var(--sc-section) var(--sc-gutter) var(--sc-section) var(--copy-left);
+}
+.lg__visual {
+  position: relative; aspect-ratio: 2057 / 1130; overflow: clip; border-radius: var(--sc-r-lg);
+  background: #03050a; box-shadow: 0 40px 90px -30px rgb(0 0 0 / 0.7);
+}
+.lg__plane, .lg__frame { position: absolute; inset: 0; pointer-events: none; }
+.lg__frame { container-type: inline-size; }
+.lg__plate { position: absolute; display: block; max-width: none; user-select: none; }
+.lg__plane--door, .lg__dim, .lg__from-cert, .lg__sky, .lg__room-fade, .lg__room-edge { display: none; }
+/* The engine starts cues hidden; the still shows all the copy. */
+.lg [data-sc-cue] { opacity: 1; }
+.lg__vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 95% at 50% 46%, transparent 55%, rgb(2 4 9 / 0.55) 100%); }
+
+/* The sign on the studio wall, where the cover's ON AIR box hangs. */
+.lg__sign { position: absolute; display: grid; place-items: center; }
+.lg__sign > span {
+  grid-area: 1 / 1; padding: 0.28em 0.55em 0.22em;
+  font-family: var(--sc-font-display); font-weight: 800; font-stretch: 108%; text-transform: uppercase;
+  font-size: 1.28cqw; letter-spacing: 0.04em; line-height: 1; white-space: nowrap;
+  color: #ffc46b; background: rgb(14 8 2 / 0.86);
+  border: max(1px, 0.1cqw) solid rgb(243 171 60 / 0.9); border-radius: 0.3em;
+  text-shadow: 0 0 0.35em rgb(255 170 60 / 0.9), 0 0 1em rgb(243 140 40 / 0.6);
+  box-shadow: 0 0 0.6em rgb(243 150 50 / 0.55), inset 0 0 0.5em rgb(243 150 50 / 0.35);
+}
+.lg__sign-on { opacity: 0; }
+
+/* Copy beside the still. */
+.lg__copy { display: flex; flex-direction: column; gap: var(--sc-4); }
+.lg__kicker { margin: 0; color: var(--amber); letter-spacing: 0.16em; }
+.lg__head { margin: 0; }
+.lg__title {
+  margin: 0; font-family: var(--sc-font-display); font-weight: 800; font-stretch: 108%;
+  font-size: var(--ts); line-height: 0.92; letter-spacing: -0.045em; text-wrap: balance;
+}
+.lg__title span { color: var(--amber); }
+.lg__tagline { margin: 0; color: var(--lounge-ink-soft); letter-spacing: 0.18em; text-transform: uppercase; font-size: 0.74rem; }
+.lg__lede { margin: 0; color: var(--lounge-ink); font-size: clamp(1rem, 0.94rem + 0.3vw, 1.15rem); line-height: 1.5; max-width: 40ch; text-wrap: pretty; }
+.lg__ai { margin: 0; display: inline-flex; align-items: center; gap: 0.55rem; color: #dfe4ee; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; }
+.lg__ai i { width: 0.45rem; height: 0.45rem; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0.6rem rgb(243 171 60 / 0.7); }
+.lg__pillars ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem 0; font-size: 0.7rem; letter-spacing: 0.26em; text-transform: uppercase; color: #e7eaf1; }
+.lg__pillars li + li::before { content: ""; display: inline-block; width: 1.5px; height: 0.95em; margin: 0 1.1em; vertical-align: -0.12em; background: var(--amber); }
+.lg__rundown { margin-top: var(--sc-4); }
+.lg__status { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.8rem; color: var(--lounge-ink-soft); font-size: var(--sc-t-sm); }
+.lg__badge { padding: 0.28rem 0.7rem; border-radius: 999px; border: 1.5px dashed var(--amber); color: var(--amber); font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.lg__rundown-title { margin: var(--sc-5) 0 var(--sc-3); color: var(--lounge-ink-soft); font-weight: 400; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; }
+.lg__topics { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+.lg__topics li {
+  padding: 0.85rem 1rem; border-radius: 12px;
+  background: rgb(8 13 26 / 0.88); border: 1px solid color-mix(in oklab, var(--lounge-ink) 18%, transparent);
+}
+.lg__topics span { display: block; color: var(--amber); font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.lg__topics b { display: block; margin-top: 0.3rem; font-weight: 600; font-size: 1rem; line-height: 1.25; letter-spacing: -0.01em; }
+.lg__more { margin: var(--sc-4) 0 0; color: var(--lounge-ink-soft); font-size: var(--sc-t-sm); }
+.lg__next {
+  display: inline-flex; align-items: center; gap: 0.45em; min-height: 2.75rem; margin-top: var(--sc-3);
+  font-family: var(--sc-font-mono); font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--amber); text-decoration: none; border-bottom: 1px solid rgb(243 171 60 / 0.4);
+}
+.lg__next:hover { border-bottom-color: var(--amber); }
+.lg__next:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; border-radius: 2px; }
+
+@media (max-width: 860px) {
+  .lg__stage { grid-template-columns: 1fr; padding: var(--sc-section) var(--sc-gutter); }
+}
+
+/* =========================================================================
+   LIVE: the pinned act
+   Rendering rules (PROJECT_HANDOFF, scroll performance):
+   - every moving plane is one composited layer moved by transform only;
+   - lights are opacity on small layers of their own;
+   - the wall and doors are canvas textures painted once per size;
+   - nothing is filtered or blurred at run time.
+   ========================================================================= */
+@media (prefers-reduced-motion: no-preference) {
+  :root.js .lg__stage { position: sticky; top: 0; height: var(--fh); display: block; padding: 0; overflow: clip; }
+  :root.js .lg__visual {
+    position: absolute; inset: 0; aspect-ratio: auto; border-radius: 0; box-shadow: none;
+    background: radial-gradient(90% 70% at 50% 40%, #0a1324, #03050a 75%);
+  }
+  :root.js .lg__plane { position: absolute; inset: 0; transform-origin: var(--vo, 50% 50%); will-change: transform; }
+  :root.js .lg__frame { position: absolute; inset: auto; left: var(--bx, 0); top: var(--by, 0); width: var(--bw, 100%); height: var(--bh, 100%); }
+  :root.js .lg__plane--room { z-index: 1; }
+  :root.js .lg__plane--h2 { z-index: 2; }
+  :root.js .lg__plane--h1 { z-index: 3; }
+  :root.js .lg__plane--fg { z-index: 4; }
+  /* the room's dark wall carried up past the plate (sampled from its top rows), for the phone framing */
+  :root.js .lg__sky { display: block; position: absolute; left: -20%; right: -20%; bottom: 99%; height: 400%; background: linear-gradient(0deg, rgb(7 12 30), #03050a 45%); }
+  /* the room plate's top edge feathered into that wall */
+  :root.js .lg__room-fade { display: block; position: absolute; left: -10%; right: -10%; top: -6.3%; height: 16%; background: linear-gradient(180deg, rgb(7 12 30), rgb(7 12 30 / 0)); }
+  /* ...and its side edges (the plate ends 70 px past the frame) into the dark beyond */
+  :root.js .lg__room-edge { display: block; position: absolute; top: -40%; bottom: -40%; width: 60%; }
+  :root.js .lg__room-edge--l { right: calc(100% - 9%); background: linear-gradient(90deg, #03050a 78%, rgb(3 5 10 / 0)); }
+  :root.js .lg__room-edge--r { left: calc(100% - 9%); background: linear-gradient(270deg, #03050a 78%, rgb(3 5 10 / 0)); }
+  :root.js .lg__sign-on { opacity: 1; }
+  :root.js .lg__sign-on, :root.js .lg__sign-prod { will-change: opacity; }
+  :root.js .lg__sign-prod { opacity: 0; }
+
+  /* the studio lights, before they come up */
+  :root.js .lg__dim { display: block; position: absolute; inset: 0; z-index: 5; background: #02040a; opacity: 0.66; will-change: opacity; pointer-events: none; }
+
+  /* the way in */
+  :root.js .lg__plane--door { display: block; z-index: 6; }
+  :root.js .lg__wall { position: absolute; background: #05080f; }
+  :root.js .lg__doorway { position: absolute; overflow: hidden; }
+  :root.js .lg__leaf { position: absolute; top: 0; bottom: 0; width: 50%; background: #0b1222; will-change: transform; }
+  :root.js .lg__leaf--l { left: 0; }
+  :root.js .lg__leaf--r { right: 0; }
+  :root.js .lg__seam {
+    position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; margin-left: -1px;
+    background: #ffc46b; box-shadow: 0 0 14px 3px rgb(243 171 60 / 0.55); opacity: 0.35; will-change: opacity;
+  }
+  :root.js .lg__spill {
+    position: absolute; height: 26vh; pointer-events: none; opacity: 0.3; will-change: opacity;
+    background: radial-gradient(50% 60% at 50% 0%, rgb(243 171 60 / 0.32), rgb(243 171 60 / 0.06) 55%, transparent 75%);
+  }
+  :root.js .lg__door-sign { position: absolute; display: grid; }
+  :root.js .lg__door-sign > span {
+    grid-area: 1 / 1; padding: 0.3em 0.6em 0.24em;
+    font-family: var(--sc-font-display); font-weight: 800; font-stretch: 108%; text-transform: uppercase;
+    font-size: clamp(1rem, 1.7vw, 1.7rem); letter-spacing: 0.05em; line-height: 1; white-space: nowrap;
+    color: rgb(243 171 60 / 0.22); background: #07090e;
+    border: 2px solid rgb(243 171 60 / 0.22); border-radius: 0.3em;
+  }
+  :root.js .lg__door-sign > .lg__lit {
+    opacity: 0; will-change: opacity; color: #ffc46b; border-color: rgb(243 171 60 / 0.95); background: rgb(14 8 2 / 0.92);
+    text-shadow: 0 0 0.35em rgb(255 170 60 / 0.9), 0 0 1em rgb(243 140 40 / 0.6);
+    box-shadow: 0 0 0.8em rgb(243 150 50 / 0.6), inset 0 0 0.5em rgb(243 150 50 / 0.35);
+  }
+
+  :root.js .lg__vignette { z-index: 7; }
+  /* Certifications' ground over the stage's top edge while it slides in */
+  :root.js .lg__from-cert {
+    display: block; position: absolute; left: 0; right: 0; top: 0; height: 30%; z-index: 8; pointer-events: none;
+    background: linear-gradient(180deg, var(--sc-canvas-cert, #0c1310), rgb(12 19 16 / 0)); will-change: opacity;
+  }
+
+  /* ---- copy over the stage ---- */
+  :root.js .lg__copy { position: absolute; inset: 0; z-index: 10; display: block; pointer-events: none; }
+  :root.js .lg__copy a { pointer-events: auto; }
+  :root.js .lg__kicker, :root.js .lg__head, :root.js .lg__tagline, :root.js .lg__lede,
+  :root.js .lg__ai, :root.js .lg__pillars, :root.js .lg__rundown { position: absolute; opacity: 0; margin: 0; }
+  /* Each fading block is its own small layer: painted once (soft text shadows included), then only faded. */
+  :root.js .lg__head, :root.js .lg__tagline, :root.js .lg__lede, :root.js .lg__ai, :root.js .lg__rundown { will-change: opacity; }
+  :root.js .lg__kicker { left: var(--copy-left); top: calc(var(--header-h) + 7svh); }
+  :root.js .lg__head, :root.js .lg__tagline, :root.js .lg__lede { left: var(--sc-gutter); right: var(--sc-gutter); text-align: center; }
+  :root.js .lg__head { top: calc(var(--header-h) + 1.4svh); }
+  :root.js .lg__title { text-shadow: 0 2px 28px rgb(0 0 0 / 0.7); }
+  :root.js .lg__tagline, :root.js .lg__lede { top: calc(var(--header-h) + 1.4svh + var(--ts) * 0.95 + 0.7rem); margin-inline: auto; }
+  :root.js .lg__tagline { font-size: 0.72rem; text-shadow: 0 1px 12px rgb(0 0 0 / 0.9); }
+  :root.js .lg__lede { max-width: 46ch; font-size: 1rem; text-shadow: 0 1px 14px rgb(0 0 0 / 0.95), 0 0 2px rgb(0 0 0 / 0.8); }
+  :root.js .lg__ai { right: var(--sc-gutter); top: calc(var(--header-h) + 16svh); text-shadow: 0 1px 10px rgb(0 0 0 / 0.9); }
+  :root.js .lg__pillars { left: 0; right: 0; top: calc(var(--desk-y, 92svh) + 0.9svh); }
+  :root.js .lg__pillars ul { justify-content: center; flex-wrap: nowrap; will-change: transform; }
+
+  :root.js .lg__rundown {
+    left: var(--sc-gutter); right: var(--sc-gutter); bottom: 3svh; margin: 0 auto; max-width: 62rem;
+    display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 0.7rem 1.5rem;
+  }
+  /* Light: the desk stays visible behind the cards, which carry their own ground. */
+  :root.js .lg__rundown::before {
+    content: ""; position: absolute; z-index: -1; left: -12vw; right: -12vw; top: -1.5rem; bottom: -3svh; pointer-events: none;
+    background: linear-gradient(180deg, transparent, rgb(3 5 10 / 0.55) 2.5rem, rgb(3 5 10 / 0.72));
+  }
+  :root.js .lg__status, :root.js .lg__more { text-shadow: 0 1px 10px rgb(0 0 0 / 0.95); }
+  :root.js .lg__status { grid-column: 1 / -1; color: var(--lounge-ink); }
+  :root.js .lg__rundown-title { display: none; }
+  :root.js .lg__topics { grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  :root.js .lg__more { margin: 0; align-self: center; }
+  :root.js .lg__next { margin: 0; }
+}
+
+/* Below 1181px the access path is a pill along the bottom edge: clear it. */
+@media (max-width: 1180px) and (prefers-reduced-motion: no-preference) {
+  :root.js .lg__rundown { bottom: calc(max(0.75rem, env(safe-area-inset-bottom)) + 4rem); }
+  :root.js .lg__rundown::before { bottom: calc(-4rem - 3svh); }
+}
+
+/* ---- phones and portrait tablets: the copy above, the studio below ---- */
+@media (max-width: 860px) and (prefers-reduced-motion: no-preference) {
+  :root.js .lg { --ts: clamp(2.2rem, 11vw, 3.4rem); }
+  :root.js .lg__kicker { left: var(--sc-gutter); top: calc(var(--header-h) + 1.1rem); }
+  :root.js .lg__head { top: calc(var(--header-h) + 2.9rem); text-align: left; }
+  :root.js .lg__tagline, :root.js .lg__lede { top: calc(var(--header-h) + 2.9rem + var(--ts) * 1.9 + 0.6rem); text-align: left; margin: 0; }
+  :root.js .lg__title span { display: block; }
+  :root.js .lg__tagline { font-size: 0.64rem; letter-spacing: 0.14em; }
+  :root.js .lg__lede { font-size: 0.95rem; max-width: none; }
+  :root.js .lg__ai { left: var(--sc-gutter); bottom: auto; top: var(--ai-y, 60svh); font-size: 0.64rem; }
+  :root.js .lg__pillars ul { font-size: 0.5rem; letter-spacing: 0.16em; }
+  :root.js .lg__pillars li + li::before { margin: 0 0.6em; }
+  :root.js .lg__rundown {
+    top: calc(var(--header-h) + 1rem); bottom: auto; grid-template-columns: 1fr; gap: 0.5rem;
+  }
+  :root.js .lg__rundown::before { top: -1rem; bottom: -1.5rem; left: calc(-1 * var(--sc-gutter)); right: calc(-1 * var(--sc-gutter)); background: linear-gradient(180deg, rgb(3 5 10 / 0.92) 70%, transparent); }
+  :root.js .lg__topics { grid-template-columns: 1fr; gap: 0.4rem; }
+  :root.js .lg__topics li { padding: 0.55rem 0.8rem; }
+  :root.js .lg__topics b { font-size: 0.92rem; margin-top: 0.15rem; }
+  :root.js .lg__more { display: none; }
+  :root.js .lg__status { font-size: 0.82rem; }
+  :root.js .lg__door-sign > span { font-size: 0.95rem; }
+  /* the studio sign moves in from the phone's right edge */
+  :root.js .lg__sign { left: 55% !important; }
+  :root.js .lg__sign > span { font-size: 1.6cqw; }
+}
+/* Short phones: a compact rundown, clear of the studio and its disclosure. */
+@media (max-width: 860px) and (max-height: 700px) and (prefers-reduced-motion: no-preference) {
+  :root.js .lg__badge { display: none; }
+  :root.js .lg__rundown-title { display: block; margin: 0.2rem 0 0; font-size: 0.6rem; color: var(--amber); }
+  :root.js .lg__topics span { display: none; }
+  :root.js .lg__topics li { padding: 0.45rem 0.75rem; }
+  :root.js .lg__topics b { margin-top: 0; font-size: 0.86rem; }
+  :root.js .lg__next { min-height: 2.75rem; }
+}
+
+/* Request Access opens on the studio's floor, not a hard line. */
+.lg + .chapter--forest { background: linear-gradient(180deg, #03050a 0, var(--forest-2) min(32vh, 18rem)); }

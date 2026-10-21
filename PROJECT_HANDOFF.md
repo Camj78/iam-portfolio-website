@@ -9,7 +9,7 @@ How to resume work on Cameron Johnson's cinematic IAM portfolio. Read this file 
 - **Branch:** `feature/cinematic-redesign`. Never merge into `main`, push to any other branch, or deploy (`vercel --prod`) without Cameron's explicit approval.
 - **Dev server:** `npm run dev`, which serves http://localhost:4500. Node lives at `~/.fnm/node-versions/v20.20.0/installation/bin` (the shell may not load fnm).
 - **Large pushes:** use `git -c http.postBuffer=524288000 push`.
-- **Approved checkpoints:** the local tags `checkpoint/hero-approved`, `checkpoint/lifecycle-approved` and `checkpoint/validation-approved`.
+- **Approved checkpoints:** the local tags `checkpoint/hero-approved`, `checkpoint/lifecycle-approved`, `checkpoint/validation-approved`, `checkpoint/about-approved`, `checkpoint/certifications-approved` and `checkpoint/lounge-approved`.
 
 ## Rules that never bend
 
@@ -47,7 +47,7 @@ How to resume work on Cameron Johnson's cinematic IAM portfolio. Read this file 
 | Validation (evidence vault) | `VaultScene.tsx`, `vault.css`, `content/vault-scene.ts` | Approved (smoothness refactor approved 2026-10-21) |
 | About | `AboutScene.tsx`, `about.css`, `content/about-scene.ts` | Approved 2026-10-21 |
 | Certifications | Milestone 1 markup in `src/app/page.tsx`; SC-300 card float in `FloatCard.tsx` + `.cert__card` (globals.css) | Approved 2026-10-21 (minimal float only, no cinematic act) |
-| The Access Lounge | Milestone 1 markup in `page.tsx`, `content/lounge.ts` | Storyboard awaiting approval (`scrollcraft/builds/cinematic-redesign/LOUNGE-STORYBOARD.md`, local draft) |
+| The Access Lounge | `LoungeScene.tsx`, `lounge.css`, `content/lounge.ts`, `content/lounge-plates.json` | Approved 2026-10-21 (storyboard: `scrollcraft/builds/cinematic-redesign/LOUNGE-STORYBOARD.md`) |
 | Request Access | Milestone 1 markup in `page.tsx`, `RequestRecord.tsx` | To redesign |
 
 The full case files live at `/cfg/phase-1` and `/cfg/phase-2` (`CaseStudyShell`).
@@ -79,6 +79,13 @@ in-act (p95 frame 202 ms → 17.8 ms). The root causes and their fixes, in order
    it is far off screen: the SC-300 float alone took the trackpad run from 1% to 9–13% jank (about 58 → 52 fps)
    while Validation and About were on screen. Start such animations `paused` and let an IntersectionObserver
    set `data-in-view` (`FloatCard.tsx`).
+8. **Photographic scenes fit their composition; they never cover the stage.** The Lounge first scaled its
+   studio frame to cover the viewport: on any window narrower than the art's 1.82:1 the hosts filled 61–94% of
+   the width and their heads ran into the title. Fit a key region (subjects plus props) into the space the copy
+   leaves, and let dark extensions carry the room to the edges. Depth comes from near planes (desk, mics), not
+   from pushing on the subjects.
+9. **Warm big images at idle after load**, not when the stage approaches: decoding nine plates mid-scroll cost a
+   130 ms frame. Fading copy blocks get `will-change: opacity` so soft text shadows paint once.
 
 **Validation → About hand-off:** About's section overlaps Validation's release (`margin-top: -var(--fh)`) and
 stays hidden until its own progress is above 0. Validation's exit beat (span 7 now; it ends by backing out
@@ -134,13 +141,38 @@ pixel-identical at the switch (checked with an image diff at 1440, 834, 390 and 
   rather than clipping body's own descendants. On a phone the layout viewport then widened to 391 px, stretching
   the fixed header. Fix: `overflow-x: clip` on `.chapter--lounge` only (clips exactly at the viewport edge, so
   nothing visible changes). Sweep: no overflow at 320–1920 px. Any new section with bleed effects needs its own clip.
+  (Stage 7 replaced that cover markup; the clip stays on the Lounge section, which still carries `chapter--lounge`.)
 - **Checks (lab/, local):** `cert-check.mjs` (float range/period, reduced motion), `float-gate.mjs` (paused off
   screen), `flow-scroll.mjs <WxH>` (continuous Validation → Lounge: fps per chapter, CLS, errors),
   `zero-check.mjs` (0×0 viewport), `overflow-sweep.mjs`, `tex-hosts.mjs`.
 
+## The Access Lounge (Stage 7), approved 2026-10-21
+
+- **The act:** pinned, span 5 (4 on phones). Flat depth planes, no CSS 3D: each plane gets one
+  `translate3d() scale()` from its depth (`GEO` in `LoungeScene.tsx`). Beats: threshold (slatted wall, double
+  doors, ON AIR box) → the doors slide into the wall as the camera walks through → the studio lights come up →
+  reveal (title, tagline, AI-generated hosts disclosure) → two seats (slow push and truck; pillars on the desk
+  front) → rundown (the studio sign changes ON AIR → IN PRODUCTION; three planned topics, "not yet recorded").
+- **Framing:** a medium-wide two-shot. `KEY` (both hosts, mics, desk) is fitted below the title block with the
+  hosts at about half the desktop width (`HOSTS_SHARE`); phones put the copy above and fit the hosts to the
+  width. Hosts sit deep (about 6% scale change over the walk-in, ~1% after the reveal); the desk and mics carry
+  the parallax. Audit: heads ≥158 px below the header and ≥67 px below the title on seven desktop sizes.
+- **Assets, all from the existing cover (no generation, no Kling):** `scripts/lounge-segment.swift` (Apple
+  Vision person mask, on-device) → `scripts/prepare-lounge.py` (push-pull fill of the room, hosts with the body
+  filled behind the mics, mics/laptop/mug, side wings and desk front) → `public/lounge/optimized/*.webp`
+  (~370 KB) and `src/content/lounge-plates.json` (positions in studio-frame px). The cover's frame cuts each
+  host's outer shoulder; the wings ride on each host's plane and fall off into darkness below that cut.
+- **Honesty:** the hosts are AI-generated (caption on screen in every beat that shows them, and in the alt
+  text); no episodes recorded or published; the sign ends on IN PRODUCTION.
+- **Hand-offs:** Certifications' ground fades over the stage's top edge as it slides in; Request Access opens
+  on a gradient from the studio's floor colour.
+- **Measured (Iris Plus 640, 2×, continuous wheel):** 59.9 fps forward / 60 reverse in the act, p95 17.7 ms,
+  CLS 0; no horizontal overflow at 320–1920 px. Keyboard: focus in the rundown goes to p 0.95 (the engine's
+  centring cannot move a sticky stage). Reduced motion and no-JS: a still with all copy, sign IN PRODUCTION.
+- **Checks (lab/, local):** `lounge-shots.mjs <WxH> [p,…] [--reduce] [--out dir]`, `lounge-frame.mjs` (framing
+  audit), `lounge-perf.mjs`, `lounge-a11y.mjs`, `record-lounge.mjs --out review/lounge/<stamp>/….webm`.
+
 ## Remaining stages
 
-1. **The Access Lounge:** podcast chapter. No episodes are published yet, so keep it honest about that.
-   Storyboard drafted; build only after Cameron approves it and its open decisions.
-2. **Request Access:** the contact close.
-3. **Whole-site pass:** run every act in both directions, check performance, metadata, and a final audit for GHOSTD and invented claims. Then hand the merge and deploy decisions to Cameron.
+1. **Request Access:** the contact close.
+2. **Whole-site pass:** run every act in both directions, check performance, metadata, and a final audit for GHOSTD and invented claims. Then hand the merge and deploy decisions to Cameron.

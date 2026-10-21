@@ -9,8 +9,8 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { RequestRecord } from "@/components/RequestRecord";
 import { ScrollCraftMount } from "@/components/ScrollCraftMount";
 import { FloatCard } from "@/components/FloatCard";
+import { LoungeScene } from "@/components/LoungeScene";
 import { profile } from "@/content/profile";
-import { lounge, episodes } from "@/content/lounge";
 
 
 const SC300_DOMAINS = [
@@ -74,39 +74,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* THE ACCESS LOUNGE */}
-        <section id="lounge" className="chapter chapter--lounge" data-ground="lounge" aria-labelledby="lounge-title">
-          <div className="wrap">
-            <div className="lounge">
-              <div className="lounge__cover" data-sc-in>
-                <img src={lounge.cover.src} srcSet={`${lounge.cover.srcSmall} 640w, ${lounge.cover.src} 1200w`}
-                  sizes="(max-width: 960px) 90vw, 40vw" width={lounge.cover.width} height={lounge.cover.height}
-                  alt={lounge.cover.alt} loading="lazy" decoding="async" />
-              </div>
-              <div data-sc-in>
-                <h2 id="lounge-title" className="display"><span>The podcast</span>{lounge.title}</h2>
-                <p className="mono tagline" style={{ color: "var(--sc-ink-soft)" }}>{lounge.tagline}</p>
-                <p className="lede">{lounge.intro}</p>
-                <div className="lounge__status">
-                  <span className="cert__badge mono" style={{ borderColor: "var(--amber)", color: "var(--amber)" }}>In production</span>
-                  <span style={{ color: "var(--sc-ink-soft)", fontSize: "var(--sc-t-sm)" }}>
-                    No episodes published yet. Feed and platform links will appear here at launch.
-                  </span>
-                </div>
-              </div>
-            </div>
-            <ul className="episodes" aria-label="Planned episodes">
-              {episodes.map((e) => (
-                <li key={e.slug}>
-                  <span className="mono tag">Placeholder · not yet recorded</span>
-                  <h3>{e.title}</h3>
-                  <p>{e.description}</p>
-                  <span className="play" aria-hidden="true">Audio at launch</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
+        {/* THE ACCESS LOUNGE · entering the studio (redesign) */}
+        <LoungeScene />
 
         {/* REQUEST ACCESS */}
         <section id="contact" className="chapter chapter--forest" data-ground="dark" aria-labelledby="contact-title">

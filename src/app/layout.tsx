@@ -8,6 +8,7 @@ import "./lifecycle.css";
 import "./vault.css";
 import "./about.css";
 import "./portal.css";
+import "./lounge.css";
 
 const display = Archivo({
   subsets: ["latin"],
