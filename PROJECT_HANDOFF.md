@@ -7,6 +7,9 @@ How to resume work on Cameron Johnson's cinematic IAM portfolio. Read this file 
 
 - **Repo:** `Camj78/iam-portfolio-website`. Local copy: `~/Developer/iam-portfolio-website`.
 - **Branch:** `feature/cinematic-redesign`. Never merge into `main`, push to any other branch, or deploy (`vercel --prod`) without Cameron's explicit approval.
+- **Production (live since 2026-10-22):** https://iam-portfolio-website.vercel.app, Vercel project `iam-portfolio-website`
+  (team `camj78s-projects`). Vercel's Git integration deploys every push to `main` to production; other branches get
+  preview deployments. See "Launch" below.
 - **Dev server:** `npm run dev`, which serves http://localhost:4500. Node lives at `~/.fnm/node-versions/v20.20.0/installation/bin` (the shell may not load fnm).
 - **Large pushes:** use `git -c http.postBuffer=524288000 push`.
 - **Approved checkpoints:** the local tags `checkpoint/hero-approved`, `checkpoint/lifecycle-approved`, `checkpoint/validation-approved`, `checkpoint/about-approved`, `checkpoint/certifications-approved`, `checkpoint/lounge-approved` and `checkpoint/request-approved`.
@@ -223,15 +226,51 @@ pixel-identical at the switch (checked with an image diff at 1440, 834, 390 and 
   Harness note: in the long phone matrix one "back after header" step stays put on both the old and new code; the same
   sequence passes on its own (`nav-back2.mjs`). It is the test's history stack, not the site.
 
-## Pre-launch checkpoints (Cameron)
+## Launch, 2026-10-22
 
-1. **Email:** camjohnson78@gmail.com is in `profile.ts` but not approved for publication until Cameron confirms it.
-2. **LinkedIn:** Cameron verifies the link by hand (LinkedIn refuses automated checks).
-3. **Resumé PDF:** still contains the "GHOSTD Corporation" project section and lists Access Reviews. Kept temporarily;
-   do not edit it without Cameron's approval.
-4. Untracked leftovers from the Lounge stage (`public/lounge/optimized/lounge-edge-l/r.webp`, unreferenced, and
-   `assets-src/lounge/composite.jpg`) are not committed; ask before deleting.
+- **Resumé:** `public/resume/Cameron-Johnson-IAM-Resume.pdf` was replaced, byte for byte, with Cameron's October 2026
+  PDF (supplied as `IAM Career.pdf`; Canva, 1 page, 98,327 bytes, SHA-256 `076b3b3c9bf1…0e9e07`). It has the CFG
+  project "Microsoft Entra ID Identity Governance Implementation — Cashville Financial Group (CFG)" (RBAC,
+  Administrative Units, JML scenarios, access certification) and no GHOSTD. Both of its project links go to
+  `cashville-financial-group-iam`. The path did not change, so all 6 links on the site follow it (hero, About ×2,
+  Request Access terminal, the homepage footer and both case-file footers); the terminal's screen-reader size now
+  reads 96 KB. Vercel serves it with `must-revalidate`, so browsers do not keep the old copy.
+- **Commits:** feature branch `db29942` (resumé, whole-site QA fixes, hero headline "Identity Secured. Access
+  Governed.", Lounge tagline "Exploring identity. Challenging assumptions.", case-file heading outline, metadata, OG
+  image, robots, sitemap, 404). Merged into `main` by PR Camj78/iam-portfolio-website#1 as merge commit `c34527a`
+  (no squash, no force push).
+- **Vercel:** production deployment `dpl_9D1KfVm9s7C2xJmUCT2ZnpdXWU5Y`, built from `main` @ `c34527a`. Status Ready,
+  and aliased to https://iam-portfolio-website.vercel.app. The PR's preview build also passed.
+- **Verified locally (production build, before the merge):** typecheck and build clean. Hash, refresh and
+  back/forward work at 1440, 390 and with reduced motion. Real clicks reach the About plates (1440 and 390) and the
+  first Vault panel. Tab order is complete. No overflow from 320 to 1920 px. All copy shows with no JS. No console
+  errors or failed requests.
+- **Verified live:**
+  - All pages return 200, and the 404 page shows on unknown paths.
+  - The live PDF hash matches the supplied file.
+  - No GHOSTD on any page. All 12 GitHub URLs return 200 and point to CFG, the profile or the site source.
+  - All 8 chapters appear in order at 1440, 834 and 390 (contact sheets in `review/launch/`, local).
+  - No console errors or failed requests.
+  - All 8 direct hash loads land at 0, including at 390 with reduced motion.
+  - Back/forward restores the exact position.
+  - The resumé downloads from the Request Access terminal on desktop and on phone.
+- **Scripts:** `lab/launch/` (local) holds `smoke.mjs <base> <outdir> [WxH…]`, `live-hash.mjs <base> <WxH> [--reduce]`,
+  `plates-390.mjs`, `sheet.mjs`, and copies of the `qa-*` checks pointed at port 4511.
+  - `qa-click.mjs` uses desktop scroll offsets, so it reports false failures at 390; use `plates-390.mjs` there.
+  - Playwright will not `.click()` the floating terminal (it is "not stable"). Hover first, as a person does: the float pauses on hover.
+- **Not re-measured:** frame timing. The baselines above stand, and this launch changed only content, metadata and
+  `pointer-events`.
 
-## Remaining stages
+## Open items (Cameron)
 
-1. **Whole-site pass:** run every act in both directions, check performance, metadata, and a final audit for GHOSTD and invented claims, plus the recruiter-experience review. Then hand the merge and deploy decisions to Cameron.
+1. **Access reviews, site vs. resumé:** the new resumé lists Access Reviews and says the CFG project "developed an
+   access certification workflow". The site still files "Access reviews and certification" under *Learning*
+   (rule 2 above), because the CFG lab repository had no access-review evidence when the site was written. If the CFG
+   repo now documents that work, the Validation tiers, skills and case files can be updated, but only with Cameron's
+   approval and from the repository's evidence.
+2. **Resumé "IAM Portfolio" link** goes to the CFG GitHub repo, not to this website. Cameron's call; the PDF is never edited here.
+3. **Email and LinkedIn:** the site is live with camjohnson78@gmail.com. Cameron still needs to verify the LinkedIn URL by hand.
+4. **Site source:** the footer links to this public repo, whose `cases.ts` still holds GHOSTD data (unrendered). Keep or strip?
+5. **Minor:** the Access Path rail is not in the forward Tab order from the top (a structural fix, needs approval).
+6. **Local only:** untracked leftovers (`public/lounge/optimized/lounge-edge-l/r.webp`, `assets-src/lounge/composite.jpg`)
+   and `.claude/` stay uncommitted; ask before deleting. The old Desktop copy stays until Cameron authorizes deleting it.
