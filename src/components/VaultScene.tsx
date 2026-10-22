@@ -55,6 +55,8 @@ const GEO = {
 
 /** When each group lights, in order around the arc (in the original timeline, o). */
 const LIGHT_AT = [0.47, 0.53, 0.59, 0.65, 0.71];
+/** The resolved chamber: the pull-back hold, before the exit. */
+const RESOLVED = 0.84;
 
 /** Arc slots: each group at an angle; its items staggered in angle, height and depth. */
 const STAGGER: Record<number, [number, number, number][]> = {
@@ -108,7 +110,9 @@ export function VaultScene() {
       portal: q(".ev__visual .portal"),
     };
 
-    let target = reduce ? 1 : 0, current = -1, raf = 0, dead = false, lastT = 0, lastApplied = -1;
+    // Reduced motion holds the resolved chamber (the pull-back, every panel lit),
+    // not p = 1: since the exit beat, p = 1 is the dark chamber behind the door.
+    let target = reduce ? RESOLVED : 0, current = -1, raf = 0, dead = false, lastT = 0, lastApplied = -1;
     let top = 0, travel = 1;
     let cam: (p: number) => number[] = () => [0, 0, 0];
 
@@ -372,7 +376,7 @@ export function VaultScene() {
       if (!t.closest(".ev__panel, .ev__end")) return;
       if (current > 0.72 && current < 0.88) return;
       measure();
-      window.scrollTo({ top: top + 0.84 * travel, behavior: "instant" });
+      window.scrollTo({ top: top + RESOLVED * travel, behavior: "instant" });
     };
 
     measure(); onScroll(); onStage();

@@ -326,7 +326,8 @@
   :root.js .ev { height: 700vh; }
   :root.js .ev__stage { position: sticky; top: 0; height: var(--fh); display: block; padding: 0; }
   :root.js .ev__visual { position: absolute; inset: 0; height: auto; }
-  :root.js .ev__copy { position: absolute; left: var(--copy-left); top: 17%; width: min(26rem, 28vw); padding: 0; }
+  /* The copy has no controls and stays in the box after it fades, so it must not take the panels' clicks. */
+  :root.js .ev__copy { position: absolute; left: var(--copy-left); top: 17%; width: min(26rem, 28vw); padding: 0; pointer-events: none; }
   :root.js .ev__head, :root.js .ev__beats, :root.js .ev__end { position: absolute; left: 0; right: 0; top: 2.6rem; margin: 0; }
   :root.js .ev__beats { display: block; }
   :root.js .ev__beat { position: absolute; left: 0; right: 0; top: 0; opacity: 0; }

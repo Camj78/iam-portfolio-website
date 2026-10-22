@@ -18,8 +18,9 @@ import { sceneNodes, sceneLinks, farNodes, CFG_PHASE1, type SceneNode } from "@/
   simple camera: a truck to the right (planes shift by depth) and then a dolly
   through the opening wall (planes scale about one vanishing point by depth).
 
-    0.00  A.R.I.A. looks left at the name. Authored silence.
-    0.12  Turns to the visitor; the camera trucks right, the name parts.
+    0.00  A.R.I.A. looks left at the headline. Authored silence.
+    0.12  Turns to the visitor; the camera trucks right, the headline recedes
+          and is gone before the subject crosses it.
     0.38  Turns toward a slit of light in the wall.
     0.46  The wall opens. CFG's identity objects come into focus.
     0.50  Dolly through the opening. The desk and A.R.I.A. pass the lens.
@@ -44,12 +45,12 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 /** Per-breakpoint staging. Positions are % of the stage. */
 const STAGING = {
-  desktop: { ariaX0: 71, ariaX1: 37, door: 76, vpY: 44, nameSplit: 0.1 },
-  mobile: { ariaX0: 55, ariaX1: 45, door: 78, vpY: 40, nameSplit: 0.16 },
+  desktop: { ariaX0: 71, ariaX1: 37, door: 76, vpY: 44 },
+  mobile: { ariaX0: 55, ariaX1: 45, door: 78, vpY: 40 },
 };
 
 /** How far each plane sits from the lens: drives truck parallax and dolly scale. */
-const DEPTH = { rear: 0.1, wall: 0.25, name: 0.5, near: 1, fg: 1.8 };
+const DEPTH = { rear: 0.1, wall: 0.25, head: 0.5, near: 1, fg: 1.8 };
 
 const byId = Object.fromEntries(sceneNodes.map((n) => [n.id, n])) as Record<string, SceneNode>;
 
@@ -78,9 +79,9 @@ export function CinematicHero() {
       panelR: q(".cine__panel--r"),
       slit: q(".cine__slit"),
       spill: q(".cine__spill"),
-      row1: q(".cine__name-row--1"),
-      row2: q(".cine__name-row--2"),
-      name: q(".cine__name"),
+      row1: q(".cine__head-row--1"),
+      row2: q(".cine__head-row--2"),
+      head: q(".cine__head"),
       group: q(".cine__set"),
       aria: q(".cine__aria"),
       canvas: q<HTMLCanvasElement>(".cine__aria canvas"),
@@ -164,12 +165,15 @@ export function CinematicHero() {
       el.spill.style.opacity = Math.min(1, slit * 0.45 + open * 0.8).toFixed(3);
       el.spill.style.transform = `translate3d(${wallShift.toFixed(1)}px,0,0)`;
 
-      // Name: between wall and subject, so it slides at half rate and parts.
-      const split = ease(seg(p, 0.1, 0.3));
-      const nameShift = truck * DEPTH.name;
-      el.name.style.opacity = (1 - seg(p, 0.16, 0.3)).toFixed(3);
-      el.row1.style.transform = `translate3d(${(nameShift - split * S.nameSplit * W).toFixed(1)}px,0,0) scale(${(1 + 0.06 * split).toFixed(4)})`;
-      el.row2.style.transform = `translate3d(${(nameShift + split * S.nameSplit * W).toFixed(1)}px,0,0) scale(${(1 + 0.06 * split).toFixed(4)})`;
+      // Headline: between wall and subject, so it slides at half rate. It does
+      // not part (a parted line stops reading); it recedes and is gone before
+      // the subject crosses it.
+      const recede = ease(seg(p, 0.1, 0.3));
+      const headShift = truck * DEPTH.head;
+      el.head.style.opacity = (1 - seg(p, 0.12, 0.22)).toFixed(3);
+      const headT = `translate3d(${headShift.toFixed(1)}px,0,0) scale(${(1 + 0.06 * recede).toFixed(4)})`;
+      el.row1.style.transform = headT;
+      el.row2.style.transform = headT;
 
       // The set: A.R.I.A., tabletop and desk share one transform, so the hands
       // never slide off the desk. Closest plane: full truck, biggest dolly.
@@ -313,7 +317,7 @@ export function CinematicHero() {
 
   return (
     <section ref={root} id="top" className="cine" data-sc-act="pin" data-sc-span="5" data-ground="dark"
-      aria-labelledby="hero-name">
+      aria-labelledby="hero-title">
       {/* Where the Identity scene has resolved on the timeline (p ≈ 0.84). */}
       <span id="identity" className="cine__anchor" aria-hidden="true" />
 
@@ -365,10 +369,11 @@ export function CinematicHero() {
           </ul>
         </div>
 
-        {/* L3 · OVERSIZED NAME: behind the subject, parts as the camera trucks */}
-        <h1 id="hero-name" className="cine__name">
-          <span className="cine__name-row cine__name-row--1">Cameron</span>{" "}
-          <span className="cine__name-row cine__name-row--2">Johnson</span>
+        {/* L3 · OVERSIZED HEADLINE: behind the subject, recedes as the camera trucks.
+            The name is in the header and About, so it is not repeated here. */}
+        <h1 id="hero-title" className="cine__head">
+          <span className="cine__head-row cine__head-row--1"><span>Identity</span> <span>Secured.</span></span>{" "}
+          <span className="cine__head-row cine__head-row--2"><span>Access</span> <span>Governed.</span></span>
         </h1>
 
         {/* The claim sits behind the set: A.R.I.A. uncovers it */}
@@ -416,7 +421,7 @@ export function CinematicHero() {
         {/* COPY */}
         <div className="cine__open">
           <p className="cine__eyebrow mono">Identity &amp; Access Management</p>
-          <p className="cine__lede">Microsoft Entra ID access, designed and evidenced in my CFG lab.</p>
+          <p className="cine__lede">Hands-on Microsoft Entra ID: identity governance, RBAC, least privilege and joiner-mover-leaver lifecycle.</p>
         </div>
         <div className="cine__cta">
           <a className="btn btn--solid" href="#identity">Enter the CFG lab</a>

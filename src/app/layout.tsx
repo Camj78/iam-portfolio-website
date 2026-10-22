@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo, Geist, Geist_Mono } from "next/font/google";
+import { pageMeta, SITE_URL } from "@/lib/site-meta";
 import "@/vendor/scrollcraft/scrollcraft.css";
 import "./globals.css";
 import "./cinematic.css";
@@ -23,21 +24,13 @@ const description =
   "Cameron Johnson, Identity & Access Management. Evidence-based Microsoft Entra ID case studies in privileged access, scoped administration and joiner-mover-leaver lifecycle, from the Cashville Financial Group IAM lab.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://iam-portfolio-website.vercel.app"),
-  title: "Cameron Johnson | Identity & Access Management",
-  description,
+  metadataBase: new URL(SITE_URL),
+  ...pageMeta({ title: "Cameron Johnson | Identity & Access Management", description, path: "/" }),
   authors: [{ name: "Cameron Johnson", url: "https://www.linkedin.com/in/cameron-johnson615/" }],
   keywords: [
     "Identity and Access Management", "IAM", "Microsoft Entra ID", "Identity Governance",
     "Joiner Mover Leaver", "RBAC", "Privileged Identity Management", "Least Privilege", "SC-300",
   ],
-  openGraph: {
-    title: "Cameron Johnson | Identity & Access Management",
-    description,
-    type: "profile",
-    images: [{ url: "/aria/optimized/aria-front-760.webp", width: 760, height: 941, alt: "A.R.I.A., a felt puppet in a tan suit and green striped tie" }],
-  },
-  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {

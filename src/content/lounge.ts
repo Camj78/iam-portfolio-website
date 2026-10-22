@@ -16,7 +16,7 @@ export type Episode = {
 
 export const lounge = {
   title: "The Access Lounge",
-  tagline: "Identity. Cybersecurity. Real conversations.",
+  tagline: "Exploring identity. Challenging assumptions.",
   pillars: ["People", "Technology", "Security", "Opportunity"],
   cover: {
     src: "/podcast/optimized/access-lounge-cover-1200.webp",

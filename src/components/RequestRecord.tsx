@@ -104,7 +104,7 @@ export function RequestRecord() {
           <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7 13l6-6 M8 7h5v5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </a>
         <a className="btn btn--ghost" href={profile.resume} download>
-          Resumé<span className="sr-only"> (PDF, 95 KB, downloads)</span>
+          Resumé<span className="sr-only"> (PDF, 96 KB, downloads)</span>
           <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v9 M6 9.5l4 4 4-4 M5 16h10" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </a>
       </div>

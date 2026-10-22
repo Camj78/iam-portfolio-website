@@ -20,7 +20,7 @@ export function CaseFile({ c, pull }: { c: Case; pull?: React.ReactNode }) {
         <div className="case__no" aria-hidden="true">{c.number}</div>
         <div>
           <p className="mono" style={{ color: "var(--sc-ink-soft)", margin: "0 0 0.75rem" }}>Case file {c.number}</p>
-          <h3 id={`${c.id}-title`} className="display case__title">{c.title}</h3>
+          <h1 id={`${c.id}-title`} className="display case__title">{c.title}</h1>
           <p className="case__meta">{c.org} · {c.year} · hands-on lab</p>
         </div>
       </header>
@@ -28,15 +28,15 @@ export function CaseFile({ c, pull }: { c: Case; pull?: React.ReactNode }) {
       <div className="case__body">
         <aside className="case__aside">
           <section>
-            <h4 className="mono">The problem</h4>
+            <h2 className="mono">The problem</h2>
             <p className="lede">{c.problem}</p>
           </section>
           <section>
-            <h4 className="mono">Environment</h4>
+            <h2 className="mono">Environment</h2>
             <ul className="env">{c.environment.map((e) => <li key={e}>{e}</li>)}</ul>
           </section>
           <section>
-            <h4 className="mono">Documentation</h4>
+            <h2 className="mono">Documentation</h2>
             <ul className="doclinks">
               <li><a href={c.repo} target="_blank" rel="noopener noreferrer"><span>GitHub repository</span><Arrow /></a></li>
               {c.docs.map((d) => (
@@ -48,25 +48,25 @@ export function CaseFile({ c, pull }: { c: Case; pull?: React.ReactNode }) {
 
         <div className="case__main">
           <section>
-            <h4 className="mono">Architecture · {c.architecture.title}</h4>
+            <h2 className="mono">Architecture · {c.architecture.title}</h2>
             <ChainDiagram title={c.architecture.title} nodes={c.architecture.nodes} />
           </section>
 
           <section>
-            <h4 className="mono">Implementation</h4>
+            <h2 className="mono">Implementation</h2>
             <ol className="steps">
-              {before.map((s) => <li key={s.title}><div><h5>{s.title}</h5><p>{s.body}</p></div></li>)}
+              {before.map((s) => <li key={s.title}><div><h3>{s.title}</h3><p>{s.body}</p></div></li>)}
             </ol>
             {pull}
             {after.length > 0 && (
               <ol className="steps" start={before.length + 1} style={{ counterReset: `s ${before.length}` }}>
-                {after.map((s) => <li key={s.title}><div><h5>{s.title}</h5><p>{s.body}</p></div></li>)}
+                {after.map((s) => <li key={s.title}><div><h3>{s.title}</h3><p>{s.body}</p></div></li>)}
               </ol>
             )}
           </section>
 
           <section>
-            <h4 className="mono">Security principles applied</h4>
+            <h2 className="mono">Security principles applied</h2>
             <table className="principles">
               <caption className="sr-only">Security principles and how they were applied</caption>
               <tbody>
@@ -77,19 +77,19 @@ export function CaseFile({ c, pull }: { c: Case; pull?: React.ReactNode }) {
 
           <section className="split2">
             <div>
-              <h4 className="mono">Results</h4>
+              <h2 className="mono">Results</h2>
               <ul>{c.results.map((r) => <li key={r}>{r}</li>)}</ul>
-              <h4 className="mono" style={{ marginTop: "var(--sc-6)" }}>Lessons learned</h4>
+              <h2 className="mono" style={{ marginTop: "var(--sc-6)" }}>Lessons learned</h2>
               <ul>{c.lessons.map((r) => <li key={r}>{r}</li>)}</ul>
             </div>
             <div className="limits">
-              <h4 className="mono">What this does not prove</h4>
+              <h2 className="mono">What this does not prove</h2>
               <ul>{c.limitations.map((r) => <li key={r}>{r}</li>)}</ul>
             </div>
           </section>
 
           <section>
-            <h4 className="mono">Evidence</h4>
+            <h2 className="mono">Evidence</h2>
             {c.exhibits.length > 0 ? (
               <ExhibitGallery exhibits={c.exhibits} caseNo={c.number} />
             ) : (

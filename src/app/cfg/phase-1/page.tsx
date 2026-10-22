@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { CaseStudyShell } from "@/components/CaseStudyShell";
 import { publishedCases } from "@/content/cases";
+import { pageMeta } from "@/lib/site-meta";
 
 /*
   The complete CFG Phase 1 case file, moved off the homepage so the Privilege
@@ -10,11 +11,12 @@ import { publishedCases } from "@/content/cases";
 
 const case01 = publishedCases.find((c) => c.id === "case-01")!;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "CFG Phase 1: Privileged access | Cameron Johnson",
   description:
     "Cashville Financial Group IAM lab, Phase 1: separate admin identity, User Administrator scoped to AU-New York, PIM eligibility, emergency access and documented troubleshooting.",
-};
+  path: "/cfg/phase-1",
+});
 
 export default function Phase1() {
   return (

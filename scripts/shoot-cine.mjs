@@ -29,7 +29,7 @@ const VIEWPORTS = [
 const SETS = {
   top: {
     stops: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.58, 0.66, 0.74, 0.84, 1],
-    layers: [".cine__rear", ".cine__wall", ".cine__panel--l", ".cine__name-row--1", "[data-node=person]", ".cine__set", ".cine__fg", ".cine__dust--near", ".cine__id-title"],
+    layers: [".cine__rear", ".cine__wall", ".cine__panel--l", ".cine__head-row--1", "[data-node=person]", ".cine__set", ".cine__fg", ".cine__dust--near", ".cine__id-title"],
   },
   lifecycle: {
     stops: [0, 0.06, 0.12, 0.2, 0.26, 0.32, 0.4, 0.44, 0.5, 0.58, 0.62, 0.7, 0.74, 0.78, 0.82, 0.88, 0.95, 1],

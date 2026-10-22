@@ -308,7 +308,9 @@
   :root.js .ab__practice em { font-size: calc(var(--k) * 13px); }
 
   /* ---- A.R.I.A. at the console ---- */
+  /* Decorative, and in front of the practice plates (the canvas and the glow are rectangles): let clicks through. */
   :root.js .ab__host {
+    pointer-events: none;
     --hwp: calc(var(--k) * var(--hw) * 1px);
     --hh: calc(var(--k) * (var(--ariah) + var(--consh)) * 1px);
     left: calc(var(--hwp) / -2); top: calc(var(--fy) - var(--hh)); width: var(--hwp); height: var(--hh);
@@ -362,10 +364,12 @@
   :root.js .ab__dust--near { z-index: 6; background-image: radial-gradient(4px 4px at 30% 40%, rgb(240 214 176 / 0.2), transparent), radial-gradient(3.5px 3.5px at 80% 12%, rgb(240 214 176 / 0.16), transparent); background-size: 720px 640px; }
 
   /* ---- copy over the stage ---- */
+  /* The copy box spans the stage on phones: only its own controls take clicks, so the plates behind stay reachable. */
   :root.js .ab__copy {
     position: absolute; z-index: 10; left: var(--copy-left);
-    top: calc(var(--header-h) + 7svh); bottom: 8svh; width: min(27rem, 29vw);
+    top: calc(var(--header-h) + 7svh); bottom: 8svh; width: min(27rem, 29vw); pointer-events: none;
   }
+  :root.js .ab__copy :is(a, button) { pointer-events: auto; }
   :root.js .ab__voice, :root.js .ab__scene, :root.js .ab__close { position: absolute; left: 0; right: 0; top: 2.75rem; margin: 0; }
   :root.js .ab__scenes { position: static; margin: 0; padding: 0; }
   :root.js .ab__kicker, :root.js .ab__story, :root.js .ab__voice, :root.js .ab__label, :root.js .ab__title, :root.js .ab__body, :root.js .ab__close { opacity: 0; }

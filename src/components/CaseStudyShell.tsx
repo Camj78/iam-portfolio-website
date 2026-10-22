@@ -31,6 +31,7 @@ export function CaseStudyShell({ c, back, pull }: { c: Case; back: string; pull?
           <span>© 2026 Cameron Johnson</span>
           <nav aria-label="Footer">
             <a href="/">Portfolio</a>
+            <a href="/#contact">Request access</a>
             <a href={profile.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
             <a href={profile.github} target="_blank" rel="noopener noreferrer">GitHub</a>
             <a href={profile.resume} download>Resumé (PDF)</a>
