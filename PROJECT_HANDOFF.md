@@ -6,7 +6,13 @@ How to resume work on Cameron Johnson's cinematic IAM portfolio. Read this file 
 ## Where things are
 
 - **Repo:** `Camj78/iam-portfolio-website`. Local copy: `~/Developer/iam-portfolio-website`.
-- **Branch:** `feature/cinematic-redesign`. Never merge into `main`, push to any other branch, or deploy (`vercel --prod`) without Cameron's explicit approval.
+- **Branches:** `feature/cinematic-redesign` (Stages 1–8 and the launch) and `feature/aria-motion` (Stage 9, cut from
+  `main`). Never merge into `main`, push to any other branch, or deploy (`vercel --prod`) without Cameron's explicit approval.
+- **Kling archive (Stage 9):** `~/Developer/iam-portfolio-assets/aria-motion/`, outside the repo. The paid Kling clip, the
+  approved composite and every script that made it. Never modify, move or delete it; see "A.R.I.A. head turn" below.
+- **Production (live since 2026-10-22):** https://iam-portfolio-website.vercel.app, Vercel project `iam-portfolio-website`
+  (team `camj78s-projects`). Vercel's Git integration deploys every push to `main` to production; other branches get
+  preview deployments. See "Launch" below.
 - **Dev server:** `npm run dev`, which serves http://localhost:4500. Node lives at `~/.fnm/node-versions/v20.20.0/installation/bin` (the shell may not load fnm).
 - **Large pushes:** use `git -c http.postBuffer=524288000 push`.
 - **Approved checkpoints:** the local tags `checkpoint/hero-approved`, `checkpoint/lifecycle-approved`, `checkpoint/validation-approved`, `checkpoint/about-approved`, `checkpoint/certifications-approved`, `checkpoint/lounge-approved` and `checkpoint/request-approved`.
@@ -37,12 +43,14 @@ How to resume work on Cameron Johnson's cinematic IAM portfolio. Read this file 
   - Lightning CSS drops `translate:` when the same rule also sets `transform`.
   - A CSS custom property derived with `calc()` resolves where it is declared, so set JS-driven geometry variables on the element that uses them.
 - **A.R.I.A.:** three transparent poses in `public/aria/optimized` (`left`, `front` and `right`, at 760 and 480 px), blended by `src/lib/frame-player.ts`. Frame index 0 looks toward screen-left, 2 toward screen-right.
+  Since Stage 9 they are the first paint and the fallback; the head turn itself is a 24-frame Kling sequence
+  (`public/aria/motion`, `src/content/aria-motion.json`) drawn by the same player. See "A.R.I.A. head turn" below.
 - **Navigation:** the `AccessPathRail` covers Identity through Validation and becomes a pill at the bottom of the screen at 1180px wide and below. It shows once the hero's pin lets go and fades out where About's act takes over (the shared portal frame); hidden, it is `visibility: hidden`, so it leaves the tab order and the accessibility tree. `.wrap` keeps its rail inset everywhere, so nothing moves when it goes. `SiteHeader` changes its colours based on the `data-ground` of the section underneath it.
 - **Hash links and restored positions:** `lib/landing.ts`, called by `ScrollCraftMount` right after the engine mounts. See "Navigation fixes" below.
 
 | Chapter (homepage order) | Component and styles | Status |
 |---|---|---|
-| Hero → Identity | `CinematicHero.tsx`, `IdentityContinuation.tsx`, `cinematic.css` | Approved |
+| Hero → Identity | `CinematicHero.tsx`, `IdentityContinuation.tsx`, `cinematic.css` | Approved; Kling head turn approved 2026-10-22 (Stage 9) |
 | Privilege (CFG Phase 1) | `PrivilegeScene.tsx`, `privilege.css`, `content/privilege-scene.ts` | Approved |
 | Lifecycle (CFG Phase 2) | `LifecycleScene.tsx`, `lifecycle.css`, `content/lifecycle-scene.ts` | Approved |
 | Validation (evidence vault) | `VaultScene.tsx`, `vault.css`, `content/vault-scene.ts` | Approved (smoothness refactor approved 2026-10-21) |
@@ -223,15 +231,97 @@ pixel-identical at the switch (checked with an image diff at 1440, 834, 390 and 
   Harness note: in the long phone matrix one "back after header" step stays put on both the old and new code; the same
   sequence passes on its own (`nav-back2.mjs`). It is the test's history stack, not the site.
 
-## Pre-launch checkpoints (Cameron)
+## Launch, 2026-10-22
 
-1. **Email:** camjohnson78@gmail.com is in `profile.ts` but not approved for publication until Cameron confirms it.
-2. **LinkedIn:** Cameron verifies the link by hand (LinkedIn refuses automated checks).
-3. **Resumé PDF:** still contains the "GHOSTD Corporation" project section and lists Access Reviews. Kept temporarily;
-   do not edit it without Cameron's approval.
-4. Untracked leftovers from the Lounge stage (`public/lounge/optimized/lounge-edge-l/r.webp`, unreferenced, and
-   `assets-src/lounge/composite.jpg`) are not committed; ask before deleting.
+- **Resumé:** `public/resume/Cameron-Johnson-IAM-Resume.pdf` was replaced, byte for byte, with Cameron's October 2026
+  PDF (supplied as `IAM Career.pdf`; Canva, 1 page, 98,327 bytes, SHA-256 `076b3b3c9bf1…0e9e07`). It has the CFG
+  project "Microsoft Entra ID Identity Governance Implementation — Cashville Financial Group (CFG)" (RBAC,
+  Administrative Units, JML scenarios, access certification) and no GHOSTD. Both of its project links go to
+  `cashville-financial-group-iam`. The path did not change, so all 6 links on the site follow it (hero, About ×2,
+  Request Access terminal, the homepage footer and both case-file footers); the terminal's screen-reader size now
+  reads 96 KB. Vercel serves it with `must-revalidate`, so browsers do not keep the old copy.
+- **Commits:** feature branch `db29942` (resumé, whole-site QA fixes, hero headline "Identity Secured. Access
+  Governed.", Lounge tagline "Exploring identity. Challenging assumptions.", case-file heading outline, metadata, OG
+  image, robots, sitemap, 404). Merged into `main` by PR Camj78/iam-portfolio-website#1 as merge commit `c34527a`
+  (no squash, no force push).
+- **Vercel:** production deployment `dpl_9D1KfVm9s7C2xJmUCT2ZnpdXWU5Y`, built from `main` @ `c34527a`. Status Ready,
+  and aliased to https://iam-portfolio-website.vercel.app. The PR's preview build also passed.
+- **Verified locally (production build, before the merge):** typecheck and build clean. Hash, refresh and
+  back/forward work at 1440, 390 and with reduced motion. Real clicks reach the About plates (1440 and 390) and the
+  first Vault panel. Tab order is complete. No overflow from 320 to 1920 px. All copy shows with no JS. No console
+  errors or failed requests.
+- **Verified live:**
+  - All pages return 200, and the 404 page shows on unknown paths.
+  - The live PDF hash matches the supplied file.
+  - No GHOSTD on any page. All 12 GitHub URLs return 200 and point to CFG, the profile or the site source.
+  - All 8 chapters appear in order at 1440, 834 and 390 (contact sheets in `review/launch/`, local).
+  - No console errors or failed requests.
+  - All 8 direct hash loads land at 0, including at 390 with reduced motion.
+  - Back/forward restores the exact position.
+  - The resumé downloads from the Request Access terminal on desktop and on phone.
+- **Scripts:** `lab/launch/` (local) holds `smoke.mjs <base> <outdir> [WxH…]`, `live-hash.mjs <base> <WxH> [--reduce]`,
+  `plates-390.mjs`, `sheet.mjs`, and copies of the `qa-*` checks pointed at port 4511.
+  - `qa-click.mjs` uses desktop scroll offsets, so it reports false failures at 390; use `plates-390.mjs` there.
+  - Playwright will not `.click()` the floating terminal (it is "not stable"). Hover first, as a person does: the float pauses on hover.
+- **Not re-measured:** frame timing. The baselines above stand, and this launch changed only content, metadata and
+  `pointer-events`.
 
-## Remaining stages
+## A.R.I.A. head turn (Stage 9), approved 2026-10-22
 
-1. **Whole-site pass:** run every act in both directions, check performance, metadata, and a final audit for GHOSTD and invented claims, plus the recruiter-experience review. Then hand the merge and deploy decisions to Cameron.
+- **What changed:** an enhancement to the approved hero, not a redesign. A.R.I.A.'s turn (left at the headline → front
+  to the visitor → right toward the light) is now real motion from a Kling clip instead of a dissolve between three
+  stills. Headline, copy, camera, Scroll Craft timing, the Identity transition and every other chapter are unchanged.
+- **Generation (one job, 75 credits, balance 587 → 512):** Kling 4.0 `image_to_video` via the Kling MCP connector,
+  5 s, 1080p, one output. `first_image` = approved left, `keyframe_1` = front, `tail_image` = right, each flattened
+  onto the hero colour `rgb(28 34 26)`. Output 1916×1080, 24 fps, 121 frames; the front keyframe lands at frame 74.
+  Kling added two blinks (frames 20–25 and 78–83), each hiding a gaze shift. Prompt, generation id and settings are in
+  the archive README. **Do not regenerate:** reuse the archive.
+- **Archive:** `~/Developer/iam-portfolio-assets/aria-motion/` (269 files, 144 MB): the untouched MP4s
+  (`poc-clean.mp4` SHA-256 `bf076bb8…a2bb`), Kling inputs, the three reference stills, the approved 121-frame
+  composite (`composite/master/`, already in `ARIA_CROP`), the Apple Vision masks, the extraction / compositing /
+  review scripts and the review sheets. Verify with `shasum -a 256 -c SHA256SUMS` in that folder.
+- **Composite (approved 2026-10-22):** frames 0, 74 and 120 are the untouched approved stills. Above the collar the
+  Kling head (Vision mask, background un-mixed); below it the approved stills' own pixels, dissolved between poses.
+  Geometry matches the stills to ≤ 0.5 px; body drift ≤ 1 px.
+- **Shipped set:** 24 frames chosen by equal head motion (`scripts/prepare-aria-motion.mjs`, reads the archive,
+  never deletes). The 3 anchors reuse `public/aria/optimized/*` byte for byte; 21 in-betweens at q82 in
+  `public/aria/motion/` (42 files: 1,715 KB at 760 px, 1,031 KB at 480 px). Blink frames are never shipped: each set
+  keeps the open frames either side (19/26, 77/84) and the hero **cuts** between them (a saccade) instead of
+  dissolving, so no scroll position shows a half-closed eye or doubled pupils. 36 frames was not visibly sharper on
+  screen and slightly heavier; 48 was dropped (slower first scroll, most memory).
+- **Scroll Craft integration (`CinematicHero.tsx`):** same `--sc-p`, same beats. The Kling clip carries its own easing,
+  so it maps linearly: left → front over p 0.12–0.32 (Kling 0→74), front → right over 0.38–0.50 (74→120). The
+  three-still player paints first; the dense set loads with low priority after `load`, at idle, and only once the hero
+  is within a screen of the viewport (a `#contact` landing downloads none of it). It takes over only when the timeline
+  sits on a shared still, so the switch is pixel-identical. One progress source: the frame shown is a pure function
+  of scroll position, forward and reverse.
+- **Fallbacks:** reduced motion and no-JS: the static poster as before (no motion requests). Save-Data or
+  `deviceMemory` < 4: the three-still hero exactly as it shipped at launch.
+- **Measured (Iris Plus 640, headed Chrome, mains, production build):** desktop 1440 @2× turn fps 58.4–59.1 forward,
+  reverse and slow (current hero 56.0–59.4); first scroll after load 53.7–56.7 against 57.1–58.5 (first draw of each
+  frame). Phone 390 @3× within the existing hero's own spread. LCP is still the poster `<img>`; the first motion
+  request follows the load event. Decoded memory about +60 MB desktop / +24 MB phone.
+- **Known minor limitations (accepted):** (1) the approved stills carry about twice Kling's fine felt detail, so the
+  texture firms up over ~25 px of scroll as A.R.I.A. lands on the front still (left and right ease in over the
+  composite's cross-faded ends); (2) at cut 1 the face also rotates slightly in the same frame as the gaze shift.
+- **Checks (lab/, local):** `aria-qa.mjs [base]` (reduced motion, Save-Data, deep link, first paint, invisible
+  takeover, determinism, exact anchors, blink frames, overflow, tab order), `aria-perf.mjs --label x [--baseline]
+  [--size 390x844 --dpr 3]` + `aria-perf-table.mjs`, `record-aria.mjs`, `aria-flipbook.mjs` (frame-exact head
+  close-ups), `stage9-hash.mjs`. Recordings in `review/aria/`.
+
+## Open items (Cameron)
+
+1. **Access reviews, site vs. resumé:** the new resumé lists Access Reviews and says the CFG project "developed an
+   access certification workflow". The site still files "Access reviews and certification" under *Learning*
+   (rule 2 above), because the CFG lab repository had no access-review evidence when the site was written. If the CFG
+   repo now documents that work, the Validation tiers, skills and case files can be updated, but only with Cameron's
+   approval and from the repository's evidence.
+2. **Resumé "IAM Portfolio" link** goes to the CFG GitHub repo, not to this website. Cameron's call; the PDF is never edited here.
+3. **Email and LinkedIn:** the site is live with camjohnson78@gmail.com. Cameron still needs to verify the LinkedIn URL by hand.
+4. **Site source:** the footer links to this public repo, whose `cases.ts` still holds GHOSTD data (unrendered). Keep or strip?
+5. **Minor:** the Access Path rail is not in the forward Tab order from the top (a structural fix, needs approval).
+6. **Local only:** untracked leftovers (`public/lounge/optimized/lounge-edge-l/r.webp`, `assets-src/lounge/composite.jpg`)
+   and `.claude/` stay uncommitted; ask before deleting. The old Desktop copy stays until Cameron authorizes deleting it.
+7. **A.R.I.A. front-pose texture (optional):** if the texture change at the front still ever matters, the options are a
+   light sharpen of the Kling in-betweens or carrying the still's fine detail into the frames next to it. Both change
+   the approved look, so only with Cameron's approval, and from the archive, never a new generation.

@@ -1,0 +1,57 @@
+{
+  "source": "Kling 4.0 image_to_video, 2026-10-22; composite archived in ~/Developer/iam-portfolio-assets/aria-motion",
+  "sourceFrames": 121,
+  "anchors": {
+    "0": "left",
+    "74": "front",
+    "120": "right"
+  },
+  "blinksSkipped": [
+    [
+      20,
+      25
+    ],
+    [
+      78,
+      83
+    ]
+  ],
+  "cuts": [
+    [
+      19,
+      26
+    ],
+    [
+      77,
+      84
+    ]
+  ],
+  "sets": {
+    "24": [
+      0,
+      19,
+      26,
+      29,
+      32,
+      35,
+      39,
+      42,
+      45,
+      48,
+      52,
+      56,
+      59,
+      63,
+      67,
+      71,
+      74,
+      77,
+      84,
+      88,
+      92,
+      97,
+      103,
+      120
+    ]
+  }
+}
