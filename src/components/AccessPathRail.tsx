@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { accessPath } from "@/content/profile";
-import { groundAt, type Ground } from "@/lib/ground";
+import { docBox, groundAt, type Ground } from "@/lib/ground";
 
 /** The page's navigation: the authorization chain, lit as the visitor passes each step. */
 export function AccessPathRail() {
@@ -13,29 +13,39 @@ export function AccessPathRail() {
 
   useEffect(() => {
     let raf = 0;
+    // The rail is fixed, so its probe point only moves on resize. Section
+    // positions come from the cached document geometry (lib/ground): no
+    // layout reads on the scroll path.
+    let probeY = -1;
     const read = () => {
       raf = 0;
-      const vh = innerHeight;
+      const vh = innerHeight, y = scrollY;
+      // Hidden while the pinned hero owns the screen; it arrives as the pin lets go. The path ends at
+      // Validation, so it leaves again where About's act takes over (the shared portal frame).
       const hero = document.getElementById("top");
-      setVisible(!!hero && hero.getBoundingClientRect().bottom < vh * 0.55);
+      const after = document.getElementById("about");
+      setVisible(!!hero && docBox(hero).bottom - y < vh * 0.55 && !(after && docBox(after).top - y <= 0));
 
       let idx = -1;
       accessPath.forEach((s, i) => {
         const el = document.getElementById(s.id);
-        if (el && el.getBoundingClientRect().top < vh * 0.45) idx = i;
+        if (el && docBox(el).top - y < vh * 0.45) idx = i;
       });
       setCurrent(idx);
 
       // Re-ink the rail for whichever ground sits under it.
-      const r = rail.current?.getBoundingClientRect();
-      const probeY = r ? r.top + r.height / 2 : vh / 2;
+      if (probeY < 0) {
+        const r = rail.current?.getBoundingClientRect();
+        probeY = r ? r.top + r.height / 2 : vh / 2;
+      }
       setGround(groundAt(probeY, rail.current));
     };
     const kick = () => { if (!raf) raf = requestAnimationFrame(read); };
+    const onResize = () => { probeY = -1; kick(); };
     read();
     addEventListener("scroll", kick, { passive: true });
-    addEventListener("resize", kick, { passive: true });
-    return () => { cancelAnimationFrame(raf); removeEventListener("scroll", kick); removeEventListener("resize", kick); };
+    addEventListener("resize", onResize, { passive: true });
+    return () => { cancelAnimationFrame(raf); removeEventListener("scroll", kick); removeEventListener("resize", onResize); };
   }, []);
 
   return (

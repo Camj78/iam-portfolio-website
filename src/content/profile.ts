@@ -12,7 +12,7 @@ export const profile = {
   portfolioRepo: "https://github.com/Camj78/iam-portfolio-website",
   resume: "/resume/Cameron-Johnson-IAM-Resume.pdf",
   summary:
-    "Enterprise systems analyst moving into Identity & Access Management, with hands-on Microsoft Entra ID work in identity governance, joiner-mover-leaver lifecycle, RBAC, access reviews and least privilege.",
+    "Enterprise systems analyst moving into Identity & Access Management, with hands-on Microsoft Entra ID work in privileged access, scoped administration, joiner-mover-leaver lifecycle, RBAC and least privilege.",
   experience: [
     {
       org: "Nissan North America Inc.",
@@ -21,6 +21,7 @@ export const profile = {
       points: [
         "Supports enterprise digital platforms through stakeholder engagement, training initiatives and operational process improvement.",
         "Analyzes platform usage data and user feedback to identify performance gaps, operational risks and improvement opportunities.",
+        "Collaborates with product, digital and connected-services teams to support secure and scalable technology adoption across dealerships.",
       ],
     },
     {
@@ -38,9 +39,9 @@ export const profile = {
 } as const;
 
 export const accessPath = [
-  { id: "identity", step: "Identity", label: "About" },
+  { id: "identity", step: "Identity", label: "CFG lab" },
   { id: "privilege", step: "Privilege", label: "Case 01" },
   { id: "scope", step: "Scope", label: "Case 01" },
-  { id: "lifecycle", step: "Lifecycle", label: "Case 02, 03" },
+  { id: "lifecycle", step: "Lifecycle", label: "Case 02" },
   { id: "validation", step: "Validation", label: "Skills, learning" },
 ] as const;

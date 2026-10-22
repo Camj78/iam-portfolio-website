@@ -16,15 +16,24 @@ export type Episode = {
 
 export const lounge = {
   title: "The Access Lounge",
-  tagline: "Identity. Cybersecurity. Real conversations.",
+  tagline: "Exploring identity. Challenging assumptions.",
   pillars: ["People", "Technology", "Security", "Opportunity"],
   cover: {
     src: "/podcast/optimized/access-lounge-cover-1200.webp",
     srcSmall: "/podcast/optimized/access-lounge-cover-640.webp",
     width: 1200,
     height: 1200,
-    alt: "The Access Lounge podcast cover: two hosts with headphones at studio microphones under the show title, with the words Identity, Security, Opportunity and Careers.",
+    alt: "The Access Lounge podcast cover: two AI-generated hosts with headphones at studio microphones under the show title, with the words Identity, Security, Opportunity and Careers.",
   },
+  // The two hosts are AI-generated (cover artwork). Said on screen wherever they appear.
+  disclosure: "AI-generated hosts",
+  // The studio scene's description for assistive tech (LoungeScene).
+  sceneAlt: "A podcast studio after hours: the two AI-generated hosts of The Access Lounge at their microphones, a laptop and an Access Lounge mug on the desk, a blue slatted wall and warm shelves behind them.",
+  // Short form for the studio scene.
+  lede: "A planned podcast about how access really gets granted, reviewed and removed.",
+  // Status, honest until a feed exists.
+  status: "In production. No episodes published yet.",
+  statusMore: "Feed and platform links will appear here at launch.",
   intro:
     "A planned podcast about identity and access management: how access really gets granted, reviewed and removed, and how people find their way into identity security.",
   // Populated when an RSS feed exists. Leave empty until then.

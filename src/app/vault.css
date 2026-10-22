@@ -1,0 +1,388 @@
+/* =========================================================================
+   VALIDATION — the evidence vault
+   Default (no JS, reduced motion): the final chamber beside every caption.
+   Live: one pinned 6-viewport act; VaultScene.tsx flies a CSS 3D camera.
+   All 3D lengths come from --P (perspective), --D (corridor depth),
+   --C (chamber centre past the door), --R (arc radius) set by the script.
+   ========================================================================= */
+
+.ev {
+  --fh: max(100svh, 34rem);
+  --copy-left: var(--sc-gutter);
+  --P: 1000px; --D: 2600px; --C: 820px; --R: 920px; --back: 760px;
+  --cw: min(44vw, 640px);          /* corridor half-width  */
+  --ch: min(36svh, 360px);         /* corridor half-height */
+  --hole: min(28vw, 30svh, 300px); /* door radius */
+  --pw: 17rem; --ph: 12.5rem;      /* evidence panel */
+  --zc: calc(-1 * (var(--D) + var(--C)));
+  --vx: 63%; --vy: 58%;            /* vanishing point */
+  position: relative;
+  background: #070c0a;
+  color: var(--sc-ink);
+}
+@media (min-width: 1181px) { .ev { --copy-left: calc(var(--sc-gutter) + var(--rail-w)); } }
+
+/* ---------------------------------------------------------------- static */
+.ev__stage {
+  position: relative;
+  display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: center;
+  padding-left: var(--copy-left);
+  overflow: clip;
+}
+.ev__visual {
+  position: relative; grid-column: 2; grid-row: 1; height: var(--fh); overflow: clip; isolation: isolate;
+  perspective: var(--P); perspective-origin: var(--vx) var(--vy);
+}
+.ev__copy { position: relative; grid-column: 1; grid-row: 1; z-index: 6; padding: var(--sc-section) 0; }
+
+/* ------------------------------------------------------------ L0 space */
+.ev__space {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(30% 30% at var(--vx) var(--vy), rgb(102 199 147 / 0.12), transparent 70%),
+    linear-gradient(180deg, #060a08, #0a120e 60%, #050806);
+}
+.ev__dust {
+  position: absolute; left: 0; right: 0; top: -15%; height: 130%; z-index: 5; pointer-events: none;
+  background-image:
+    radial-gradient(1.3px 1.3px at 18% 26%, rgb(236 231 220 / 0.28), transparent),
+    radial-gradient(1.5px 1.5px at 66% 64%, rgb(160 230 190 / 0.22), transparent),
+    radial-gradient(1.1px 1.1px at 40% 86%, rgb(236 231 220 / 0.2), transparent);
+  background-size: 300px 280px;
+}
+
+/* ------------------------------------------------- the 3D world (camera) */
+.ev__world {
+  position: absolute; left: var(--vx); top: var(--vy); width: 0; height: 0;
+  transform-style: preserve-3d;
+  transform-origin: 0 0 var(--P);   /* the camera turns around the eye */
+  will-change: transform;
+}
+.ev__corridor, .ev__chamber, .ev__arc, .ev__group { position: absolute; left: 0; top: 0; transform-style: preserve-3d; }
+.ev__arc { list-style: none; margin: 0; padding: 0; }
+.ev__group { display: block; }
+
+/* L1 · corridor: four planes from just in front of the lens to the door, each
+   cut into eight depth segments (--i) so the script can cull the ones the
+   camera has passed. The pattern is offset per segment, so they read as one. */
+.ev__plane {
+  --L: calc((var(--D) + 400px) / 8);
+  position: absolute; display: block; backface-visibility: visible; opacity: var(--corr, 1);
+}
+.ev__plane--floor, .ev__plane--ceiling {
+  left: calc(-1 * var(--cw)); width: calc(2 * var(--cw)); height: calc(var(--L) + 2px);
+  transform-origin: 50% 0; transform: translateZ(calc(400px - var(--i, 0) * var(--L))) rotateX(-90deg);
+  background-position: 0 calc(var(--i, 0) * -1 * var(--L));
+}
+.ev__plane--floor {
+  top: var(--ch);
+  background:
+    linear-gradient(90deg, transparent 49.6%, rgb(102 199 147 / 0.55) 49.8%, rgb(102 199 147 / 0.55) 50.2%, transparent 50.4%),
+    repeating-linear-gradient(180deg, rgb(236 231 220 / 0.06) 0 2px, transparent 2px 220px),
+    linear-gradient(90deg, #0b1410, #111d17 50%, #0b1410);
+}
+.ev__plane--ceiling {
+  top: calc(-1 * var(--ch));
+  background:
+    linear-gradient(90deg, transparent 30%, rgb(236 231 220 / 0.18) 30.4%, transparent 30.8%, transparent 69.2%, rgb(236 231 220 / 0.18) 69.6%, transparent 70%),
+    repeating-linear-gradient(180deg, rgb(0 0 0 / 0.5) 0 2px, transparent 2px 220px),
+    #080e0b;
+}
+.ev__plane--left, .ev__plane--right {
+  top: calc(-1 * var(--ch)); height: calc(2 * var(--ch)); width: calc(var(--L) + 2px);
+  transform-origin: 0 50%; transform: translateZ(calc(400px - var(--i, 0) * var(--L))) rotateY(90deg);
+  background-position: calc(var(--i, 0) * -1 * var(--L)) 0;
+  background:
+    linear-gradient(180deg, transparent 17.5%, rgb(102 199 147 / 0.6) 17.8%, rgb(102 199 147 / 0.6) 18.4%, transparent 18.7%),
+    linear-gradient(180deg, transparent 81.3%, rgb(102 199 147 / 0.35) 81.6%, rgb(102 199 147 / 0.35) 82%, transparent 82.3%),
+    repeating-linear-gradient(90deg, rgb(0 0 0 / 0.55) 0 3px, transparent 3px 220px),
+    linear-gradient(180deg, #0c1612, #0f1b16 50%, #0a120e);
+}
+.ev__plane--left { left: calc(-1 * var(--cw)); }
+.ev__plane--right { left: var(--cw); }
+
+/* The bulkhead at the end of the corridor, with a round opening */
+.ev__bulkhead {
+  position: absolute; left: calc(-1 * var(--cw)); top: calc(-1 * var(--ch));
+  width: calc(2 * var(--cw)); height: calc(2 * var(--ch));
+  transform: translateZ(calc(-1 * var(--D)));
+  transform-style: preserve-3d;
+}
+.ev__bulkhead::before {
+  content: ""; position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 50% 50%, transparent calc(var(--hole) - 1px), rgb(102 199 147 / 0.6) var(--hole), #1a2a22 calc(var(--hole) + 3px), #101b16 calc(var(--hole) + 26px), #0c1511 calc(var(--hole) + 27px)),
+    #0c1511;
+  -webkit-mask: radial-gradient(circle at 50% 50%, transparent var(--hole), #000 calc(var(--hole) + 1px));
+  mask: radial-gradient(circle at 50% 50%, transparent var(--hole), #000 calc(var(--hole) + 1px));
+  transform: translateZ(1px);
+  opacity: var(--corr, 1);
+}
+/* Once painted (VaultScene), the ring is a canvas texture in the same place. */
+.ev__bulkhead.has-tex::before { display: none; }
+.ev__bulkhead > canvas.tex { transform: translateZ(1px); opacity: var(--corr, 1); }
+.ev__door {
+  position: absolute; left: 50%; top: 50%; width: calc(2 * var(--hole)); height: calc(2 * var(--hole));
+  translate: -50% -50%; transform-style: preserve-3d;
+}
+.ev__door-half {
+  position: absolute; top: 0; height: 100%; width: 50%;
+  background:
+    repeating-radial-gradient(circle at var(--cx) 50%, rgb(236 231 220 / 0.05) 0 2px, transparent 2px 22px),
+    linear-gradient(180deg, #24342c, #16221c);
+  box-shadow: inset 0 0 0 1px rgb(236 231 220 / 0.1);
+  opacity: var(--corr, 1);
+  will-change: transform;
+}
+.ev__door-half--l { left: 0; border-radius: 999px 0 0 999px; --cx: 100%; border-right: 2px solid #0a120e; }
+.ev__door-half--r { right: 0; border-radius: 0 999px 999px 0; --cx: 0%; border-left: 2px solid #0a120e; }
+.ev__door-ring {
+  position: absolute; inset: 22%; border-radius: 50%;
+  border: 2px solid rgb(102 199 147 / 0.55);
+  box-shadow: 0 0 0 10px rgb(10 18 14 / 0.6), 0 0 0 11px rgb(236 231 220 / 0.12);
+  transform: translateZ(1px);
+}
+.ev__door-ring i {
+  position: absolute; left: 50%; top: -9px; width: 14px; height: 14px; margin-left: -7px; border-radius: 4px;
+  background: #2c3f35; border: 1px solid rgb(236 231 220 / 0.25);
+  transform-origin: 7px calc(9px + var(--hole) * 0.56);
+}
+.ev__door-ring i:nth-child(1) { transform: rotate(0deg); }
+.ev__door-ring i:nth-child(2) { transform: rotate(60deg); }
+.ev__door-ring i:nth-child(3) { transform: rotate(120deg); }
+.ev__door-ring i:nth-child(4) { transform: rotate(180deg); }
+.ev__door-ring i:nth-child(5) { transform: rotate(240deg); }
+.ev__door-ring i:nth-child(6) { transform: rotate(300deg); }
+.ev__door-label {
+  position: absolute; left: 50%; top: 50%; translate: -50% -50%; white-space: nowrap;
+  font-family: var(--sc-font-mono); font-size: 0.8rem; letter-spacing: 0.24em; text-transform: uppercase; color: rgb(236 231 220 / 0.6);
+  transform: translateZ(2px);
+}
+/* Light from the chamber, seen through the opening as the door parts */
+.ev__flood {
+  position: absolute; left: -900px; top: -700px; width: 1800px; height: 1400px;
+  transform: translateZ(calc(-1 * var(--D) - 60px));
+  background: radial-gradient(40% 40% at 50% 50%, rgb(180 240 205 / 0.35), rgb(102 199 147 / 0.12) 45%, transparent 70%);
+  opacity: 0; pointer-events: none;
+}
+
+/* L2 · the chamber */
+.ev__chamber-floor, .ev__chamber-wall { position: absolute; display: block; opacity: var(--cham, 1); }
+.ev__panel, .ev__group-label { opacity: var(--cham, 1); }
+/* The chamber floor: ten 520px depth segments of one 6000 × 5200 surface. */
+.ev__chamber-floor {
+  left: -3000px; width: 6000px; top: var(--ch); height: 522px;
+  transform-origin: 50% 0;
+  transform: translateZ(calc(var(--zc) + 2400px - var(--i, 0) * 520px)) rotateX(-90deg);
+  background:
+    radial-gradient(40% 32% at 50% 46%, rgb(102 199 147 / 0.16), transparent 70%),
+    repeating-linear-gradient(90deg, rgb(236 231 220 / 0.05) 0 1px, transparent 1px 140px),
+    repeating-linear-gradient(180deg, rgb(236 231 220 / 0.05) 0 1px, transparent 1px 140px);
+  background-size: 100% 5200px;
+  background-position: 0 calc(var(--i, 0) * -520px);
+}
+.ev__chamber-wall {
+  left: -3000px; width: 6000px; top: -1800px; height: 3600px;
+  transform: translateZ(calc(var(--zc) - var(--R) - var(--back) - 200px));
+  background:
+    radial-gradient(30% 34% at 50% 52%, rgb(102 199 147 / 0.1), transparent 70%),
+    repeating-linear-gradient(90deg, rgb(0 0 0 / 0.5) 0 2px, transparent 2px 180px),
+    #0a120e;
+}
+
+/* The evidence: each panel hung on the arc around the camera */
+.ev__panel, .ev__group-label {
+  position: absolute; left: calc(var(--pw) / -2); top: calc(var(--ph) / -2); width: var(--pw);
+  transform:
+    translateZ(var(--zc))
+    rotateY(calc(var(--a, 0deg) + var(--ia, 0deg)))
+    translateZ(calc(-1 * var(--R) - var(--iz, 0px)))
+    translateY(calc(var(--iy, 0) * var(--ph) * 1.08));
+}
+.ev__group-label {
+  --ia: 0deg; --iz: 0px; --iy: -1.36;
+  height: var(--ph); display: flex; align-items: flex-end; justify-content: center; pointer-events: none;
+  font-family: var(--sc-font-mono); font-size: 0.82rem; letter-spacing: 0.16em; text-transform: uppercase; white-space: nowrap;
+  color: rgb(236 231 220 / calc(0.25 + 0.65 * var(--lit, 1)));
+}
+.ev__group { --lit: 1; }
+.ev__panel {
+  height: var(--ph); padding: 0.55rem; display: grid; grid-template-rows: 1fr auto auto; gap: 0.35rem;
+  text-align: left; cursor: pointer; color: inherit; font: inherit;
+  border-radius: 14px;
+  border: 1px solid rgb(102 199 147 / calc(0.12 + 0.5 * var(--lit)));
+  background: linear-gradient(180deg, rgb(26 39 32 / 0.92), rgb(14 22 18 / 0.94));
+  box-shadow:
+    inset 0 1px 0 rgb(236 231 220 / 0.1),
+    0 24px 48px -20px rgb(0 0 0 / 0.9),
+    0 10px 40px -12px rgb(102 199 147 / calc(0.35 * var(--lit)));
+  transition: border-color var(--sc-d-fast) var(--sc-ease-out);
+}
+.ev__panel:hover { border-color: rgb(102 199 147 / 0.9); }
+.ev__panel:focus-visible { outline: 3px solid var(--sc-accent); outline-offset: 3px; }
+.ev__thumb { position: relative; display: block; overflow: hidden; border-radius: 9px; background: #0a120e; min-height: 0; }
+.ev__thumb img {
+  display: block; width: 100%; height: 100%; object-fit: cover; object-position: top left;
+  filter: blur(calc((1 - var(--lit)) * 5px)) brightness(calc(0.3 + 0.7 * var(--lit))) saturate(calc(0.4 + 0.6 * var(--lit)));
+}
+.ev__thumb-none {
+  position: absolute; inset: 0; display: grid; place-items: center; text-align: center;
+  font-family: var(--sc-font-mono); font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgb(236 231 220 / calc(0.2 + 0.4 * var(--lit)));
+  background: repeating-linear-gradient(135deg, rgb(236 231 220 / 0.04) 0 6px, transparent 6px 12px);
+}
+.ev__panel-meta { font-family: var(--sc-font-mono); font-size: 0.56rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgb(102 199 147 / calc(0.3 + 0.7 * var(--lit))); }
+.ev__panel-title { font-size: 0.9rem; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; color: rgb(236 231 220 / calc(0.3 + 0.7 * var(--lit))); text-wrap: balance; }
+
+/* Learning and Next: the back wall's shelves. Outlined and empty, never lit. */
+.ev__shelf {
+  --show: 1;
+  position: absolute; left: -900px; top: calc(-1 * var(--ch) - 330px); width: 1800px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+  transform: translateZ(calc(var(--zc) - var(--R) - var(--back)));
+  opacity: calc(var(--cham, 1) * var(--show));
+}
+.ev__tier-label { display: block; margin-bottom: 20px; font-family: var(--sc-font-mono); font-size: 28px; letter-spacing: 0.16em; text-transform: uppercase; }
+.ev__tier--learning .ev__tier-label { color: var(--felt); }
+.ev__tier--next .ev__tier-label { color: rgb(236 231 220 / 0.55); }
+/* Compact chips: the tier label already says "in study" or "planned". */
+.ev__tier ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 14px; }
+.ev__tier li { padding: 12px 20px; border-radius: 999px; font-size: 24px; font-weight: 600; line-height: 1.2; white-space: nowrap; }
+.ev__tier li span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.ev__tier--learning li { border: 3px dashed rgb(200 162 124 / 0.6); color: rgb(236 231 220 / 0.85); }
+.ev__tier--next li { border: 3px dotted rgb(236 231 220 / 0.25); color: rgb(236 231 220 / 0.55); }
+
+/* L4 · foreground bulkhead ribs */
+.ev__fg {
+  position: absolute; top: -10%; height: 120%; width: 9vw; z-index: 6; pointer-events: none; display: none;
+  background: linear-gradient(90deg, #050806, #0f1914 60%, rgb(102 199 147 / 0.18) 62%, #0b1410 66%, #050806);
+  filter: blur(6px);
+}
+.ev__fg--l { left: -3vw; }
+.ev__fg--r { right: -3vw; transform: scaleX(-1); }
+
+/* -------------------------------------------------------------- copy */
+.ev__kicker { margin: 0 0 var(--sc-4); color: var(--sc-accent); letter-spacing: 0.14em; }
+.ev__title {
+  margin: 0; font-family: var(--sc-font-display); font-weight: 800; font-stretch: 108%;
+  font-size: clamp(3.4rem, 8vw, 9.5rem); line-height: 0.88; letter-spacing: -0.05em;
+}
+.ev__lede { margin: var(--sc-5) 0 0; font-size: clamp(1.1rem, 0.9rem + 0.55vw, 1.45rem); line-height: 1.35; letter-spacing: -0.012em; max-width: 24ch; text-wrap: balance; }
+.ev__beats { list-style: none; margin: var(--sc-8) 0 0; padding: 0; display: grid; gap: var(--sc-6); }
+.ev .ev__beat { opacity: 1; }
+.ev__beat-title { margin: 0; font-family: var(--sc-font-display); font-weight: 800; font-stretch: 108%; font-size: clamp(1.8rem, 3vw, 2.8rem); line-height: 0.96; letter-spacing: -0.04em; text-wrap: balance; }
+.ev__beat-body { margin: var(--sc-3) 0 0; color: var(--sc-ink-soft); max-width: 32ch; line-height: 1.5; }
+.ev__end { margin-top: var(--sc-8); }
+.ev__legend { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sc-3); }
+.ev__legend li {
+  display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: var(--sc-4);
+  align-items: baseline; padding: var(--sc-3) var(--sc-4); border-radius: 14px;
+}
+.ev__legend b { font-family: var(--sc-font-display); font-weight: 800; font-size: clamp(1.4rem, 2.2vw, 2rem); letter-spacing: -0.03em; }
+.ev__legend span { justify-self: end; font-family: var(--sc-font-mono); font-size: 1rem; }
+.ev__legend em { grid-column: 1 / -1; font-style: normal; color: var(--sc-ink-soft); font-size: var(--sc-t-sm); }
+.ev__legend small { grid-column: 1 / -1; margin-top: 0.35rem; font-size: 0.74rem; line-height: 1.45; color: rgb(236 231 220 / 0.7); }
+.ev__legend [data-tier="demonstrated"] { border: 1px solid rgb(102 199 147 / 0.55); background: rgb(102 199 147 / 0.08); }
+.ev__legend [data-tier="demonstrated"] b, .ev__legend [data-tier="demonstrated"] span { color: var(--sc-accent); }
+.ev__legend [data-tier="learning"] { border: 1.5px dashed rgb(200 162 124 / 0.6); }
+.ev__legend [data-tier="learning"] b, .ev__legend [data-tier="learning"] span { color: var(--felt); }
+.ev__legend [data-tier="next"] { border: 1.5px dotted rgb(236 231 220 / 0.3); }
+.ev__legend [data-tier="next"] b { color: rgb(236 231 220 / 0.7); }
+.ev__rule { margin: var(--sc-4) 0 0; font-family: var(--sc-font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sc-ink-soft); }
+
+/* ------------------------------------------------------------ dialog */
+.ev__dialog {
+  margin: auto; /* the CSS reset zeroes margins, which un-centres a modal dialog */
+  width: min(64rem, calc(100vw - 2rem)); max-height: calc(100dvh - 2rem); overflow: auto; overscroll-behavior: contain;
+  padding: 0; border: 1px solid rgb(102 199 147 / 0.4); border-radius: 22px;
+  background: #0e1814; color: var(--sc-ink);
+  box-shadow: 0 40px 120px -20px rgb(0 0 0 / 0.9);
+}
+.ev__dialog::backdrop { background: rgb(4 8 6 / 0.78); backdrop-filter: blur(6px); }
+.ev__sheet { padding: clamp(1.25rem, 3vw, 2.25rem); }
+.ev__sheet-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.ev__sheet-head .mono { margin: 0; color: var(--sc-accent); }
+.ev__close {
+  width: 2.75rem; height: 2.75rem; border-radius: 50%; border: 1px solid var(--sc-hairline-strong);
+  background: none; color: var(--sc-ink); font-size: 1.4rem; line-height: 1; cursor: pointer;
+}
+.ev__close:hover { border-color: var(--sc-ink); }
+.ev__sheet-title { margin: var(--sc-4) 0 0; font-family: var(--sc-font-display); font-weight: 800; font-stretch: 108%; font-size: clamp(1.6rem, 3vw, 2.6rem); line-height: 1; letter-spacing: -0.035em; }
+.ev__sheet-claim { margin: var(--sc-3) 0 0; color: var(--sc-ink-soft); max-width: 60ch; line-height: 1.5; }
+.ev__shots { margin-top: var(--sc-5); display: grid; gap: var(--sc-3); }
+.ev__shots:has(figure + figure) { grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
+.ev__shots figure { margin: 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--sc-hairline); background: #fff; }
+.ev__shots img { display: block; width: 100%; height: auto; }
+.ev__redacted { margin: var(--sc-3) 0 0; color: var(--sc-ink-soft); font-size: 0.66rem; }
+.ev__noshot { margin: var(--sc-5) 0 0; padding: var(--sc-4); border: 1px dashed var(--sc-hairline-strong); border-radius: 12px; color: var(--sc-ink-soft); }
+.ev__sheet-links { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sc-3) var(--sc-5); margin-top: var(--sc-6); }
+.ev__gh { display: inline-flex; align-items: center; gap: 0.4em; min-height: 2.75rem; color: var(--sc-accent); font-weight: 600; text-decoration: none; border-bottom: 1px solid color-mix(in oklab, var(--sc-accent) 40%, transparent); }
+.ev__gh:hover { border-bottom-color: var(--sc-accent); }
+
+/* =========================================================================
+   LIVE
+   ========================================================================= */
+@media (prefers-reduced-motion: no-preference) {
+  :root.js .ev { height: 700vh; }
+  :root.js .ev__stage { position: sticky; top: 0; height: var(--fh); display: block; padding: 0; }
+  :root.js .ev__visual { position: absolute; inset: 0; height: auto; }
+  /* The copy has no controls and stays in the box after it fades, so it must not take the panels' clicks. */
+  :root.js .ev__copy { position: absolute; left: var(--copy-left); top: 17%; width: min(26rem, 28vw); padding: 0; pointer-events: none; }
+  :root.js .ev__head, :root.js .ev__beats, :root.js .ev__end { position: absolute; left: 0; right: 0; top: 2.6rem; margin: 0; }
+  :root.js .ev__beats { display: block; }
+  :root.js .ev__beat { position: absolute; left: 0; right: 0; top: 0; opacity: 0; }
+  :root.js .ev__beat-title { font-size: clamp(2rem, 3.4vw, 3.6rem); line-height: 0.95; }
+  :root.js .ev__beat-body { margin-top: var(--sc-4); font-size: clamp(1rem, 0.9rem + 0.3vw, 1.15rem); }
+  /* Final frame: the three tiers as one row along the bottom, under the arc. */
+  :root.js .ev__end {
+    opacity: 0; top: auto; bottom: auto;
+    top: calc(83svh - 17svh - 9.5rem);
+    width: min(76rem, calc(100vw - var(--copy-left) - var(--sc-gutter)));
+  }
+  :root.js .ev__legend { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sc-4); }
+  :root.js .ev__legend li { background: rgb(7 12 10 / 0.88); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); align-content: start; }
+  :root.js .ev__fg { display: block; }
+  :root.js .ev__shelf { --show: 0; }
+  :root.js .ev__group { --lit: 0; }
+  :root.js .ev__copy::before {
+    content: none;
+  }
+}
+/* A scrim for the caption column, as a sibling plane of the copy */
+@media (prefers-reduced-motion: no-preference) and (min-width: 861px) {
+  :root.js .ev__visual::after {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 56%; z-index: 5; pointer-events: none;
+    background: radial-gradient(120% 70% at 0% 22%, rgb(7 12 10 / 0.96) 0%, rgb(7 12 10 / 0.86) 45%, transparent 75%);
+  }
+}
+
+/* =========================================================================
+   PHONE
+   ========================================================================= */
+@media (max-width: 860px) {
+  .ev { --cw: 58vw; --ch: 30svh; --hole: min(38vw, 22svh); --pw: 11.5rem; --ph: 9rem; --vx: 50%; --vy: 60%; }
+  .ev__stage { grid-template-columns: 1fr; padding-left: 0; }
+  .ev__visual { grid-column: 1; grid-row: 2; height: 78svh; }
+  .ev__copy { padding: var(--sc-section) var(--sc-gutter) var(--sc-6); }
+  .ev__panel-title { font-size: 0.76rem; }
+  .ev__panel-meta { font-size: 0.5rem; }
+  .ev__group-label { font-size: 0.66rem; }
+  /* The phone lists Learning and Next in the legend; the back-wall shelf would be unreadable. */
+  .ev__shelf { display: none; }
+}
+@media (max-width: 860px) and (prefers-reduced-motion: no-preference) {
+  :root.js .ev__copy { left: var(--sc-gutter); right: var(--sc-gutter); width: auto; top: calc(var(--header-h) + 0.5rem); }
+  :root.js .ev__title { font-size: clamp(3rem, 16vw, 5.5rem); }
+  :root.js .ev__beat-title { font-size: clamp(1.7rem, 8vw, 2.6rem); }
+  :root.js .ev__beat-body { margin-top: var(--sc-2); font-size: 0.92rem; }
+  :root.js .ev__legend { grid-template-columns: 1fr; gap: var(--sc-2); }
+  :root.js .ev__end { top: calc(100svh - var(--header-h) - 0.5rem - 25rem); width: auto; }
+  :root.js .ev__legend li { padding: var(--sc-2) var(--sc-3); }
+  :root.js .ev__legend b { font-size: 1.15rem; }
+  :root.js .ev__legend em { font-size: 0.78rem; }
+  :root.js .ev__legend small { font-size: 0.68rem; margin-top: 0.2rem; }
+  :root.js .ev__visual::after {
+    content: ""; position: absolute; left: 0; right: 0; top: 0; height: 42%; z-index: 5; pointer-events: none;
+    background: linear-gradient(180deg, rgb(7 12 10 / 0.92), rgb(7 12 10 / 0.7) 60%, transparent);
+  }
+}

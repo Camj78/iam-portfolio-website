@@ -2,6 +2,9 @@
 //   CFG   https://github.com/Camj78/cashville-financial-group-iam
 //   GHOSTD https://github.com/Camj78/ghostd-identity-governance-implementation
 // Limitations are copied in deliberately: they are part of the evidence.
+//
+// The published site shows CFG only. GHOSTD (case-03) is kept here locally until
+// the redesign is approved, and is filtered out by `publishedCases`.
 
 export type Exhibit = {
   src: string;
@@ -306,3 +309,6 @@ export const cases: CaseFile[] = [
     exhibits: [],
   },
 ];
+
+/** The only case files the site renders: Cashville Financial Group. */
+export const publishedCases = cases.filter((c) => c.org.startsWith("Cashville Financial Group"));
