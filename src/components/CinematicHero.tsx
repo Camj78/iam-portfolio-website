@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { profile } from "@/content/profile";
 import { createFramePlayer, type FramePlayer } from "@/lib/frame-player";
+import motion from "@/content/aria-motion.json";
 import { sceneNodes, sceneLinks, farNodes, CFG_PHASE1, type SceneNode } from "@/content/identity-scene";
 
 /*
@@ -29,12 +30,41 @@ import { sceneNodes, sceneLinks, farNodes, CFG_PHASE1, type SceneNode } from "@/
 
   Reduced motion and no-JS: no pin. The stage becomes two static frames, the
   studio and the resolved identity scene, with every piece of copy visible.
+
+  A.R.I.A.'s head turn: the three approved stills paint first (and stay the
+  fallback on Save-Data or low-memory devices). After load, at idle, and only
+  once the hero is near the viewport, the in-between frames of the Kling turn
+  load behind them; the denser set takes over the next time the timeline sits
+  on one of the three stills, which both sets share. Both are drawn from the
+  same p, so scroll alone decides the frame.
 */
 
 const POSES = ["left", "front", "right"] as const;
 const FRAMES = {
   desktop: POSES.map((p) => `/aria/optimized/aria-${p}-760.webp`),
   mobile: POSES.map((p) => `/aria/optimized/aria-${p}-480.webp`),
+};
+
+/** Kling source frames in the shipped set (scripts/prepare-aria-motion.mjs). 74 is the front still, 120 the right. */
+const MOTION_SET = "24";
+const MOTION_SRC: number[] = motion.sets[MOTION_SET];
+const FRONT_SRC = 74, LAST_SRC = motion.sourceFrames - 1;
+const motionUrl = (i: number, w: number) => {
+  const pose = (motion.anchors as Record<string, string>)[i];
+  return pose ? `/aria/optimized/aria-${pose}-${w}.webp` : `/aria/motion/aria-${String(i).padStart(3, "0")}-${w}.webp`;
+};
+const MOTION = {
+  desktop: MOTION_SRC.map((i) => motionUrl(i, 760)),
+  mobile: MOTION_SRC.map((i) => motionUrl(i, 480)),
+};
+/** Steps across a skipped blink: the gaze jumps there, so they cut (a saccade) instead of dissolving. */
+const CUT = new Set(motion.cuts.map(([a, b]) => `${a}-${b}`));
+/** Fractional index into the set for a position on the Kling clip's own timeline. */
+const motionIndex = (src: number) => {
+  let j = 0;
+  while (j < MOTION_SRC.length - 2 && MOTION_SRC[j + 1] <= src) j++;
+  const t = clamp01((src - MOTION_SRC[j]) / (MOTION_SRC[j + 1] - MOTION_SRC[j]));
+  return j + (CUT.has(`${MOTION_SRC[j]}-${MOTION_SRC[j + 1]}`) ? (t < 0.5 ? 0 : 1) : t);
 };
 
 const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
@@ -101,6 +131,10 @@ export function CinematicHero() {
     const nodes = sceneNodes.map((n) => ({ n, el: st.querySelector<HTMLElement>(`[data-node="${n.id}"]`)! }));
 
     let player: FramePlayer | null = null;
+    // The dense head-turn set, loading or loaded, until it takes over from the stills.
+    let pending: FramePlayer | null = null, pendingReady = false, turning = false;
+    const nav = navigator as Navigator & { connection?: { saveData?: boolean }; deviceMemory?: number };
+    const motionOk = !nav.connection?.saveData && (nav.deviceMemory ?? 8) >= 4;
     let target = 0, current = -1, raf = 0, dead = false;
     let W = 1, H = 1, ariaW = 0, top = 0, travel = 1;
 
@@ -114,12 +148,44 @@ export function CinematicHero() {
 
     const load = () => {
       player?.dispose();
+      pending?.dispose();
+      pending = null; pendingReady = false; turning = false;
       el.aria.removeAttribute("data-ready");
+      el.aria.removeAttribute("data-motion");
       player = createFramePlayer(el.canvas, small.matches ? FRAMES.mobile : FRAMES.desktop, {
         dissolve: [0.32, 0.68],
         onFirstDraw: () => { if (!dead) el.aria.setAttribute("data-ready", ""); },
         onReady: () => { if (dead) return; current = -1; kick(); },
       });
+      if (motionOk && near) whenIdle(loadMotion);
+    };
+
+    // Only once the hero is within a screen of the viewport: a visitor who lands
+    // on #contact and never scrolls back up never downloads the in-between frames.
+    let near = false;
+    const nearHero = new IntersectionObserver((entries) => {
+      if (!entries.some((e) => e.isIntersecting)) return;
+      nearHero.disconnect();
+      near = true;
+      if (motionOk) whenIdle(loadMotion);
+    }, { rootMargin: "100% 0px" });
+
+    // After the page has loaded and the main thread is free, so the hero's first
+    // paint and the rest of the page never wait on the in-between frames.
+    const whenIdle = (fn: () => void) => {
+      const go = () => ("requestIdleCallback" in window ? requestIdleCallback(fn, { timeout: 3000 }) : setTimeout(fn, 1500));
+      if (document.readyState === "complete") go(); else addEventListener("load", go, { once: true });
+    };
+    const loadMotion = () => {
+      if (dead || turning) return;
+      pending?.dispose();
+      pendingReady = false;
+      const next: FramePlayer = createFramePlayer(el.canvas, small.matches ? MOTION.mobile : MOTION.desktop, {
+        dissolve: [0, 1],
+        priority: "low",
+        onReady: () => { if (dead || pending !== next) return; pendingReady = true; kick(); },
+      });
+      pending = next;
     };
 
     const lineLength = (l: Element, mobile: boolean) => {
@@ -182,7 +248,17 @@ export function CinematicHero() {
       el.group.style.transform = `translate3d(${truck.toFixed(1)}px,0,0) scale(${near.toFixed(4)})`;
       el.group.style.opacity = (1 - seg(p, 0.66, 0.78)).toFixed(3);
       el.aria.style.transform = `translate3d(${((S.ariaX0 / 100) * W - ariaW / 2).toFixed(1)}px,0,0)`;
-      player?.draw(t1 + t2);
+      // Head turn. The stills ease between poses (t1, t2); the Kling clip carries
+      // its own easing, so it runs on the same beats linearly: left → front over
+      // 0.12–0.32, front → right over 0.38–0.50.
+      const h1 = seg(p, 0.12, 0.32), h2 = seg(p, 0.38, 0.5);
+      if (pendingReady && (h1 === 0 || (h1 === 1 && h2 === 0) || h2 === 1)) {
+        // On a shared still: the switch cannot show.
+        player?.dispose();
+        player = pending; pending = null; pendingReady = false; turning = true;
+        el.aria.setAttribute("data-motion", "");
+      }
+      player?.draw(turning ? motionIndex(h2 > 0 ? FRONT_SRC + (LAST_SRC - FRONT_SRC) * h2 : FRONT_SRC * h1) : t1 + t2);
 
       // Foreground: out-of-focus objects right at the lens. Fastest everything.
       const fgShift = truck * DEPTH.fg;
@@ -296,6 +372,7 @@ export function CinematicHero() {
     measure();
     load();
     onScroll();
+    nearHero.observe(section);
     addEventListener("scroll", onScroll, { passive: true });
     addEventListener("resize", onResize, { passive: true });
     small.addEventListener("change", onMedia);
@@ -306,11 +383,13 @@ export function CinematicHero() {
       dead = true;
       cancelAnimationFrame(raf);
       mo.disconnect();
+      nearHero.disconnect();
       removeEventListener("scroll", onScroll);
       removeEventListener("resize", onResize);
       small.removeEventListener("change", onMedia);
       section.removeEventListener("focusin", onFocus);
       player?.dispose();
+      pending?.dispose();
       section.removeAttribute("data-live");
     };
   }, []);
