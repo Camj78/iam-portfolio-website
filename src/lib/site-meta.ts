@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
-// Production metadata. The temporary Vercel domain until a custom domain is bought:
-// change SITE_URL here and every canonical, Open Graph and sitemap URL follows.
-export const SITE_URL = "https://iam-portfolio-website.vercel.app";
+// Production metadata. The custom domain; Vercel 308-redirects www and the .vercel.app domain here.
+// Every canonical, Open Graph and sitemap URL follows SITE_URL.
+export const SITE_URL = "https://iamtechcam.com";
 export const SITE_NAME = "Cameron Johnson · Identity & Access Management";
 
 // 1200×630 frame of the live hero (lab: lab/qa-og.mjs), shared by every page.

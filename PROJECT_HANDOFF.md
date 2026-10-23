@@ -326,7 +326,7 @@ Decision: phones and tablets get a separate lightweight page; desktop is untouch
   tablets (User-Agent, `Sec-CH-UA-Mobile`), or when the `view` cookie says `lite`. `?view=lite|full` sets the cookie.
   The URL stays `/`. Each page is static and hydrates its own markup.
 - **Safety net (`LITE_GUARD`, first element of `/`):** a touch-first device that still received the cinematic page
-  (iPadOS asks for desktop sites with a Mac User-Agent) sets `view=lite`, stops loading and reloads before hydration.
+  (iPadOS asks for desktop sites with a Mac User-Agent) stops loading and reloads as `?view=lite` before hydration (the proxy then sets the cookie).
 - **`/m` (`src/app/m/page.tsx`, `src/components/LiteChapters.tsx`, `src/app/lite.css`):** same chapters, order, copy,
   evidence and links, from the same content modules; 2D only (no 3D context, canvas, scene effects, engine or motion
   frames). Certifications, Request access and the footer are shared with `/` (`SharedSections.tsx`). Entrances

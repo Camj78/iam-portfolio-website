@@ -157,6 +157,26 @@ const ipadState = await ipad.page.evaluate(() => ({ lite: !!document.querySelect
 check("iPad desktop mode: guard reloads into lite before any scene mounts", ipadState.lite && ipadState.live === 0 && !ipadState.engine && /view=lite/.test(ipadState.cookie) && ipad.net.motion === 0, `${JSON.stringify(ipadState)} documents=${ipad.net.docs}`);
 await ipad.ctx.close();
 
+// Cookies blocked: Set-Cookie stripped and document.cookie inert. The guard must still land on lite once.
+const blocked = await browser.newContext({ viewport: { width: 1024, height: 1366 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: MAC_UA });
+await blocked.addInitScript(() => Object.defineProperty(Document.prototype, "cookie", { get: () => "", set: () => {}, configurable: true }));
+await blocked.route("**/*", async (route) => { const r = await route.fetch(); const h = { ...r.headers() }; delete h["set-cookie"]; await route.fulfill({ response: r, headers: h }); });
+const bp = await blocked.newPage(); let bDocs = 0; bp.on("request", (r) => { if (r.resourceType() === "document") bDocs++; });
+await bp.goto(base + "/", { waitUntil: "load" }); await bp.waitForTimeout(3000);
+const bState = await bp.evaluate(() => ({ lite: !!document.querySelector(".lt"), url: location.pathname + location.search }));
+check("iPad desktop mode, cookies blocked: one reload to lite, no loop", bState.lite && bDocs === 2, `${JSON.stringify(bState)} documents=${bDocs}`);
+await blocked.close();
+
+// ---------------------------------------------------------------- metadata
+const SITE = "https://iamtechcam.com";
+const meta = async (ua) => { const h = await fetch(base + "/", { headers: { "user-agent": ua } }).then((r) => r.text());
+  return { canonical: h.match(/<link rel="canonical" href="([^"]+)"/)?.[1], og: h.match(/<meta property="og:url" content="([^"]+)"/)?.[1], title: h.match(/<title>([^<]+)/)?.[1], noindex: /noindex/.test(h) }; };
+const [mDesk, mPhone] = [await meta(MAC_UA), await meta(IPHONE_UA)];
+const sitemap = await fetch(base + "/sitemap.xml").then((r) => r.text()), robots = await fetch(base + "/robots.txt").then((r) => r.text());
+const metaOk = [mDesk, mPhone].every((m) => m.canonical === SITE && m.og === SITE && !m.noindex && m.title === mDesk.title)
+  && !/\/m</.test(sitemap) && sitemap.includes(`${SITE}/cfg/phase-1`) && robots.includes(`${SITE}/sitemap.xml`);
+check("metadata: both variants canonical and og:url https://iamtechcam.com, indexable; sitemap and robots on the domain, no /m", metaOk, JSON.stringify({ mDesk, mPhone }));
+
 // ---------------------------------------------------------------- reduced motion
 console.log(`\n# iPhone, reduced motion`);
 const reduced = await open(base + "/", { ...PHONE, reducedMotion: "reduce" });
