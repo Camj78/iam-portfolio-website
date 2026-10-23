@@ -8,7 +8,8 @@
     "start": "next start -p 4500",
     "typecheck": "tsc --noEmit",
     "assets": "node scripts/prepare-assets.mjs",
-    "shoot": "node scripts/shoot.mjs"
+    "shoot": "node scripts/shoot.mjs",
+    "guard:mobile": "node scripts/mobile-guard.mjs"
   },
   "dependencies": {
     "motion": "^14.4.0",
