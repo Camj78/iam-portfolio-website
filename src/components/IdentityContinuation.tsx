@@ -7,7 +7,7 @@ import { CFG_PHASE1 } from "@/content/identity-scene";
   parallax rates.
 */
 
-const TYPES = [
+export const IDENTITY_TYPES = [
   { n: "01", title: "Workforce", body: "Marcus Reed's everyday account, used for daily work." },
   { n: "02", title: "Privileged", body: "A separate admin identity, Marcus Reed (Admin), used only for IAM tasks." },
   { n: "03", title: "Emergency access", body: "EA-01 and EA-02 hold Global Administrator for recovery only." },
@@ -19,7 +19,7 @@ export function IdentityContinuation() {
       <div className="wrap">
         <div className="idx__grid">
           <ol className="idx__types" data-sc-in data-sc-stagger="90">
-            {TYPES.map((t) => (
+            {IDENTITY_TYPES.map((t) => (
               <li key={t.n}>
                 <span className="mono">{t.n}</span>
                 <h3>{t.title}</h3>

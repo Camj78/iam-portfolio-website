@@ -313,6 +313,28 @@ pixel-identical at the switch (checked with an image diff at 1440, 834, 390 and 
   [--size 390x844 --dpr 3]` + `aria-perf-table.mjs`, `record-aria.mjs`, `aria-flipbook.mjs` (frame-exact head
   close-ups), `stage9-hash.mjs`. Recordings in `review/aria/`.
 
+## Mobile: the lightweight home page (Stage 11, 2026-10-23)
+
+iPhone Safari and Chrome showed "A problem repeatedly occurred" on the live site. Stage 10 isolated it on a physical
+iPhone (iOS 26.6.2) over a LAN diagnostic proxy (`lab/stage10b/`, logs and READMEs there): plain HTML, React
+hydration, the shared shell and the hero alone all pass; every route with a 3D chapter crashes. The Validation scene
+crashed even as static HTML with no React, no animation, no images and no filters, the moment its 3D geometry was
+shown. No iOS crash or Jetsam log was available, so the mechanism inside WebKit is not known.
+
+Decision: phones and tablets get a separate lightweight page; desktop is untouched.
+- **Gate (`src/proxy.ts`, `src/lib/view.ts`):** before any HTML is sent, `/` is rewritten to `/m` for phones and
+  tablets (User-Agent, `Sec-CH-UA-Mobile`), or when the `view` cookie says `lite`. `?view=lite|full` sets the cookie.
+  The URL stays `/`. Each page is static and hydrates its own markup.
+- **Safety net (`LITE_GUARD`, first element of `/`):** a touch-first device that still received the cinematic page
+  (iPadOS asks for desktop sites with a Mac User-Agent) stops loading and reloads as `?view=lite` before hydration (the proxy then sets the cookie).
+- **`/m` (`src/app/m/page.tsx`, `src/components/LiteChapters.tsx`, `src/app/lite.css`):** same chapters, order, copy,
+  evidence and links, from the same content modules; 2D only (no 3D context, canvas, scene effects, engine or motion
+  frames). Certifications, Request access and the footer are shared with `/` (`SharedSections.tsx`). Entrances
+  (`LiteReveal`) never hide content before hydration and are off under reduced motion. Canonical is `/`.
+- **Desktop unchanged:** server markup identical to the previous build apart from the guard script; identical layer
+  counts at every chapter (`npm run guard:mobile -- <base> --baseline <url>`, 27 checks).
+- **Not changed:** the `/cfg` case files (2D already; checked on an emulated iPhone).
+
 ## Open items (Cameron)
 
 1. **Access reviews, site vs. resumé:** the new resumé lists Access Reviews and says the CFG project "developed an
