@@ -266,6 +266,10 @@ pixel-identical at the switch (checked with an image diff at 1440, 834, 390 and 
 - **Not re-measured:** frame timing. The baselines above stand, and this launch changed only content, metadata and
   `pointer-events`.
 
+- **Resumé update, 2026-10-23:** `public/resume/Cameron-Johnson-IAM-Resume.pdf` replaced, byte for byte, with Cameron's
+  revised `IAM Career.pdf` (98,270 bytes, SHA-256 `12b964eb1a7f…f4f1f`). The only change from the launch copy is the
+  header link, now "iamtechcam.com" instead of "IAM Portfolio". Content, path and the 96 KB label are unchanged.
+
 ## A.R.I.A. head turn (Stage 9), approved 2026-10-22
 
 - **What changed:** an enhancement to the approved hero, not a redesign. A.R.I.A.'s turn (left at the headline → front
